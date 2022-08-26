@@ -7,12 +7,6 @@
 
 ## Installation
 
-### Clone
-
-For example using `https`: `https://github.com/madnessJs/range-slider.git`
-
-### Play
-
 Linux:
 
-`python3 blackjack.py`
+`git clone https://gitlab.com/alagunoff/blackjack.git && cd blackjack && python3 blackjack.py`
