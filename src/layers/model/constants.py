@@ -1,10 +1,11 @@
 from shared.constants import DECK
 
+from layers.model.types import State
 
-DEFAULT_STATE = {
+DEFAULT_STATE: State = {
     'deck': DECK.copy(),
     'bank': 0,
-    'computer': {
+    'skynet': {
         'deck': [],
         'score': 0,
     },
@@ -14,3 +15,4 @@ DEFAULT_STATE = {
         'money': 10
     },
 }
+MAX_CARDS_NUMBER_ON_HAND = 5

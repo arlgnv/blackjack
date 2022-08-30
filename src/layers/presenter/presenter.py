@@ -11,10 +11,10 @@ class Presenter:
         self._view.subscribe('cardTaken', self._take_card)
         self._view.request_bet(self._model.get_state())
 
-    def _make_bet(self, amount):
+    def _make_bet(self, amount: int):
         self._model.make_bet(amount)
         self._view.display_status(self._model.get_state())
-        self._view.request_action()
+        self._view.request_card_taking()
 
     def _take_card(self):
         self._model.take_card()
