@@ -1,5 +1,5 @@
 from typing import Literal, Callable
 
 
-EventName = Literal["betMade"] | Literal["cardTaken"]
+EventName = Literal['betMade', 'cardTaken', 'gameFinished']
 Observers = dict[EventName, list[Callable[..., None]]]
