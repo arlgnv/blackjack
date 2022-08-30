@@ -18,4 +18,11 @@ class Presenter:
 
     def _take_card(self):
         self._model.take_card()
-        self._view.display_status(self._model.get_state())
+        state = self._model.get_state()
+
+        self._view.display_status(state)
+
+        if len(state['player']['deck']) < 5:
+            self._view.request_card_taking()
+        else:
+            print('Игра окончена')

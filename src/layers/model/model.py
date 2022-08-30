@@ -19,14 +19,14 @@ class Model(Observable):
         self._state['bank'] = amount
         self._state['player']['money'] -= amount
 
-        self._hand_out_to_skynet()
+        self._hand_out_cards_to_skynet()
         self._hand_out_card('player')
         self._hand_out_card('player')
 
     def take_card(self):
         self._hand_out_card('player')
 
-    def _hand_out_to_skynet(self):
+    def _hand_out_cards_to_skynet(self):
         self._hand_out_card('skynet')
         self._hand_out_card('skynet')
 
