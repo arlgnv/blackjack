@@ -2,61 +2,77 @@ import random
 
 from observable.observable import Observable
 
-from layers.model.constants import DEFAULT_STATE, WIN_SCORE, COMPUTER_NAME
-from layers.model.types import Subject
+from layers.model.types import GameStages, PlayerNames, PlayerName, Winner
+from layers.model.constants import DEFAULT_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND, DRAW
 
 
 class Model(Observable):
     def __init__(self):
         super().__init__()
 
-        self._state = DEFAULT_STATE
+        self._game = DEFAULT_STATE
 
-    def get_state(self):
-        return self._state
+    def get_game_state(self):
+        return self._game
+
+    def start_game(self):
+        self._game['stage'] = GameStages.BET_IS_AWAITED.value
 
     def make_bet(self, amount: int):
-        self._state['bank'] = amount
-        self._state['player']['money'] -= amount
+        self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED.value
+        self._game['bank'] = amount
+        self._game[PlayerNames.PLAYER.value]['money'] -= amount
 
         self._hand_out_cards_to_skynet()
-        self._hand_out_card('player')
-        self._hand_out_card('player')
+        self._hand_out_card(PlayerNames.PLAYER.value)
+        self._hand_out_card(PlayerNames.PLAYER.value)
 
     def take_card(self):
-        self._hand_out_card('player')
+        self._hand_out_card(PlayerNames.PLAYER.value)
 
-        if len(self._state['player']['deck']) == 5:
+        if len(self._game[PlayerNames.PLAYER.value]['deck']) == MAX_CARDS_NUMBER_ON_HAND:
             self.finish_game()
 
     def finish_game(self):
-        winner = self._get_winner(
-            self._state['player']['score'], self._state[COMPUTER_NAME]['score'])
-        self._state['is_finished'] = True
-        self._state['deck'].extend(
-            self._state['player']['deck'])
-        self._state['deck'].extend(
-            self._state[COMPUTER_NAME]['deck'])
-        self._state['winner'] = winner
-        self._state[winner]['money'] += self._state['bank'] * 2
-        self._state['bank'] = 0
-        self._state['player']['deck'].clear()
-        self._state['player']['score'] = 0
-        self._state[COMPUTER_NAME]['deck'].clear()
-        self._state[COMPUTER_NAME]['score'] = 0
+        self._game['stage'] = GameStages.FINISHED.value
+        self._game['winner'] = self._get_winner()
+
+    def reset_game_state(self):
+        self._game['deck'].extend(
+            self._game[PlayerNames.PLAYER.value]['deck'])
+        self._game['deck'].extend(
+            self._game[PlayerNames.SKYNET.value]['deck'])
+
+        winner = self._game['winner']
+        if winner and winner != DRAW:
+            self._game[winner]['money'] += self._game['bank'] * 2
+        self._game['winner'] = None
+
+        self._game['bank'] = 0
+        self._game[PlayerNames.PLAYER.value]['deck'].clear()
+        self._game[PlayerNames.PLAYER.value]['score'] = 0
+        self._game[PlayerNames.SKYNET.value]['deck'].clear()
+        self._game[PlayerNames.SKYNET.value]['score'] = 0
 
     def _hand_out_cards_to_skynet(self):
-        self._hand_out_card(COMPUTER_NAME)
-        self._hand_out_card(COMPUTER_NAME)
+        self._hand_out_card(PlayerNames.SKYNET.value)
+        self._hand_out_card(PlayerNames.SKYNET.value)
 
-        while random.randint(0, 1) == 0 and len(self._state[COMPUTER_NAME]['deck']) < 5 and self._state[COMPUTER_NAME]['score'] < 20:
-            self._hand_out_card(COMPUTER_NAME)
+        while random.randint(0, 1) == 0 and len(self._game[PlayerNames.SKYNET.value]['deck']) < MAX_CARDS_NUMBER_ON_HAND and self._game[PlayerNames.SKYNET.value]['score'] < 20:
+            self._hand_out_card(PlayerNames.SKYNET.value)
 
-    def _hand_out_card(self, subject: Subject):
-        card = self._state['deck'].pop(
-            random.randint(0, len(self._state['deck']) - 1))
-        self._state[subject]['deck'].append(card)
-        self._state[subject]['score'] += card
+    def _hand_out_card(self, player_name: PlayerName):
+        card = self._game['deck'].pop(
+            random.randrange(0, len(self._game['deck'])))
 
-    def _get_winner(self, player_score: int, skynet_score: int):
-        return 'player' if abs(player_score - WIN_SCORE) < abs(skynet_score - WIN_SCORE) else COMPUTER_NAME
+        self._game[player_name]['deck'].append(card)
+        self._game[player_name]['score'] += card
+
+    def _get_winner(self) -> Winner:
+        skynet_score = self._game[PlayerNames.SKYNET.value]['score']
+        player_score = self._game[PlayerNames.PLAYER.value]['score']
+
+        if skynet_score == player_score:
+            return DRAW
+
+        return PlayerNames.SKYNET.value if abs(skynet_score - WIN_SCORE) < abs(player_score - WIN_SCORE) else PlayerNames.PLAYER.value

@@ -1,12 +1,12 @@
 from shared.constants import DECK
 
-from layers.model.types import State
+from layers.model.types import Game, GameStages
 
-DEFAULT_STATE: State = {
-    'is_finished': False,
-    'winner': None,
+DEFAULT_STATE: Game = {
+    'stage': GameStages.GAME_STARTING_IS_AWAITED.value,
     'deck': DECK.copy(),
     'bank': 0,
+    'winner': None,
     'skynet': {
         'deck': [],
         'score': 0,
@@ -20,4 +20,4 @@ DEFAULT_STATE: State = {
 }
 WIN_SCORE = 21
 MAX_CARDS_NUMBER_ON_HAND = 5
-COMPUTER_NAME = 'skynet'
+DRAW = 'draw'
