@@ -12,12 +12,12 @@ class Presenter:
         self._view.display_game_status(self._model.get_game_state())
 
     def _subscribe_to_view_events(self) -> None:
-        self._view.subscribe(EventNames.GAME_STARTED.value,
+        self._view.subscribe(EventNames.GAME_STARTED,
                              self._handle_game_start)
-        self._view.subscribe(EventNames.BET_MADE.value, self._handle_bet_make)
-        self._view.subscribe(EventNames.CARD_TAKEN.value,
+        self._view.subscribe(EventNames.BET_MADE, self._handle_bet_make)
+        self._view.subscribe(EventNames.CARD_TAKEN,
                              self._handle_card_take)
-        self._view.subscribe(EventNames.GAME_FINISHED.value,
+        self._view.subscribe(EventNames.GAME_FINISHED,
                              self._handle_game_finish)
 
     def _handle_game_start(self) -> None:

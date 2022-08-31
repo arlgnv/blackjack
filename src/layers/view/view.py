@@ -1,7 +1,7 @@
 from observable import Observable, EventNames
 from layers.model import Game, GameStages, PlayerNames
 
-from .constants import WINNER_TO_DISPLAYED_WINNER, MESSAGES, AFFIRMATIVE_RESPONSES
+from .constants import WINNER_TO_DISPLAYED_WINNER, MESSAGES, AFFIRMATIVE_PLAYER_ANSWERS
 
 
 class View(Observable):
@@ -12,40 +12,40 @@ class View(Observable):
 
     def display_game_status(self, game: Game) -> None:
         match game['stage']:
-            case GameStages.GAME_STARTING_IS_AWAITED.value:
+            case GameStages.GAME_STARTING_IS_AWAITED:
                 self._request_game_starting()
-            case GameStages.BET_IS_AWAITED.value:
+            case GameStages.BET_IS_AWAITED:
                 self._request_bet(game)
-            case GameStages.CARD_TAKING_IS_AWAITED.value:
+            case GameStages.CARD_TAKING_IS_AWAITED:
                 self._print_player_result(game)
                 self._request_card_taking()
-            case GameStages.FINISHED.value:
+            case GameStages.FINISHED:
                 self._print_game_result(game)
             case _:
                 pass
 
     def _request_game_starting(self) -> None:
-        if self._check_if_player_response_affirmative(input('Сыграем? [y/n] ')):
-            self.notify(EventNames.GAME_STARTED.value)
+        if self._check_if_player_answer_affirmative(input('Сыграем? [y/n] ')):
+            self.notify(EventNames.GAME_STARTED)
 
     def _request_bet(self, game: Game) -> None:
         while True:
             bet = input(
                 f'Твоя ставка(макс. {game[PlayerNames.PLAYER.value]["money"]}): ')
 
-            if not bet or bet.isdigit():
+            if bet.isdigit():
                 break
 
-        self.notify(EventNames.BET_MADE.value, int(bet))
+        self.notify(EventNames.BET_MADE, int(bet))
 
     def _request_card_taking(self) -> None:
-        if self._check_if_player_response_affirmative(input('Возьмем еще карту? [y/n] ')):
-            self.notify(EventNames.CARD_TAKEN.value)
+        if self._check_if_player_answer_affirmative(input('Возьмем еще карту? [y/n] ')):
+            self.notify(EventNames.CARD_TAKEN)
         else:
-            self.notify(EventNames.GAME_FINISHED.value)
+            self.notify(EventNames.GAME_FINISHED)
 
-    def _check_if_player_response_affirmative(self, response: str) -> bool:
-        return response in AFFIRMATIVE_RESPONSES
+    def _check_if_player_answer_affirmative(self, answer: str) -> bool:
+        return answer in AFFIRMATIVE_PLAYER_ANSWERS
 
     def _print_welcome(self) -> None:
         print(MESSAGES['welcome'])
@@ -58,7 +58,7 @@ class View(Observable):
 
     def _print_game_result(self, game: Game) -> None:
         print(f'''
-Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner']] if game['winner'] else 'Ничья'}
+Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner'].value] if game['winner'] else 'Ничья'}
 Выигрыш: {game['winnings'] or '0'}
 ===============
 Твои карты: {game[PlayerNames.PLAYER.value]['deck']}

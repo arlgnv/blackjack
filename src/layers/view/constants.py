@@ -19,4 +19,4 @@ MESSAGES = {
 - В случае твоего выигрыша, твоя ставка умножается на 2
 '''
 }
-AFFIRMATIVE_RESPONSES = ('', 'y')
+AFFIRMATIVE_PLAYER_ANSWERS = ('', 'y')

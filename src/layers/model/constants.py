@@ -3,7 +3,7 @@ from shared.constants import DECK
 from .types import Game, GameStages
 
 DEFAULT_STATE: Game = {
-    'stage': GameStages.GAME_STARTING_IS_AWAITED.value,
+    'stage': GameStages.GAME_STARTING_IS_AWAITED,
     'deck': DECK.copy(),
     'bank': 0,
     'winner': None,
