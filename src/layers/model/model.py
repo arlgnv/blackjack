@@ -23,7 +23,7 @@ class Model(Observable):
         self.hand_out_card_to_player()
         self.hand_out_card_to_player()
 
-    def make_bet_for_player(self, amount: int):
+    def make_bet_for_player(self, amount: int) -> None:
         self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
         self._make_bet(PlayerNames.PLAYER, amount)
 
@@ -38,26 +38,9 @@ class Model(Observable):
         self._game['winner'] = self._determine_winner()
 
     def restart_game(self) -> None:
-        self._game['deck'].extend(
-            self._game[PlayerNames.SKYNET.value]['deck'])
-        self._game['deck'].extend(
-            self._game[PlayerNames.PLAYER.value]['deck'])
-        self._game[PlayerNames.SKYNET.value]['deck'].clear()
-        self._game[PlayerNames.SKYNET.value]['score'] = 0
-        self._game[PlayerNames.PLAYER.value]['deck'].clear()
-        self._game[PlayerNames.PLAYER.value]['score'] = 0
-
-        bank = self._game['bank']
-        winner = self._game['winner']
-        if winner:
-            self._game[winner.value]['money'] += bank
-        else:
-            winnings = int(bank / 2)
-            self._game[PlayerNames.SKYNET.value]['money'] += winnings
-            self._game[PlayerNames.PLAYER.value]['money'] += winnings
-        self._game['bank'] = 0
-        self._game['winner'] = None
-
+        self._take_cards_from_player(PlayerNames.SKYNET)
+        self._take_cards_from_player(PlayerNames.PLAYER)
+        self._distribute_winnings()
         self.start_game()
 
     def _make_bet_for_skynet(self) -> None:
@@ -90,6 +73,24 @@ class Model(Observable):
             return None
 
         return PlayerNames.SKYNET if abs(skynet_score - WIN_SCORE) < abs(player_score - WIN_SCORE) else PlayerNames.PLAYER
+
+    def _take_cards_from_player(self, player_name: PlayerNames) -> None:
+        self._game['deck'].extend(
+            self._game[player_name.value]['deck'])
+        self._game[player_name.value]['deck'].clear()
+        self._game[player_name.value]['score'] = 0
+
+    def _distribute_winnings(self) -> None:
+        bank = self._game['bank']
+        winner = self._game['winner']
+        if winner:
+            self._game[winner.value]['money'] += bank
+        else:
+            winnings = int(bank / 2)
+            self._game[PlayerNames.SKYNET.value]['money'] += winnings
+            self._game[PlayerNames.PLAYER.value]['money'] += winnings
+        self._game['bank'] = 0
+        self._game['winner'] = None
 
     def _check_if_player_full(self, player_name: PlayerNames) -> bool:
         return len(
