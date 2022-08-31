@@ -17,10 +17,17 @@ class PlayerNames(Enum):
 PlayerName = Literal[PlayerNames.SKYNET, PlayerNames.PLAYER]
 
 
+class Skynet(TypedDict):
+    money: int
+    deck: list[int]
+    score: int
+
+
 class Player(TypedDict):
     money: int
     deck: list[int]
     score: int
+    is_full: bool
 
 
 class Game(TypedDict):
@@ -29,6 +36,6 @@ class Game(TypedDict):
     deck: list[int]
     bank: int
     winner: Optional[PlayerName]
-    winnings: Optional[int]
-    skynet: Player
+    winnings: int
+    skynet: Skynet
     player: Player

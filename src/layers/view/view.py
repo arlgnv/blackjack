@@ -42,7 +42,7 @@ class View(Observable):
         if self._check_if_player_answer_affirmative(input('Возьмем еще карту? [y/n] ')):
             self.notify(EventNames.CARD_TAKEN)
         else:
-            self.notify(EventNames.GAME_FINISHED)
+            self.notify(EventNames.ENOUGH_SAID)
 
     def _check_if_player_answer_affirmative(self, answer: str) -> bool:
         return answer in AFFIRMATIVE_PLAYER_ANSWERS

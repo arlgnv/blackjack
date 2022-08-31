@@ -7,16 +7,17 @@ DEFAULT_STATE: Game = {
     'deck': DECK.copy(),
     'bank': 0,
     'winner': None,
-    'winnings': None,
+    'winnings': 0,
     'skynet': {
+        'money': 0,
         'deck': [],
         'score': 0,
-        'money': 0
     },
     'player': {
+        'is_full': False,
+        'money': 10,
         'deck': [],
         'score': 0,
-        'money': 10
     },
 }
 WIN_SCORE = 21

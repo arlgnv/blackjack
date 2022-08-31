@@ -29,9 +29,8 @@ class Model(Observable):
 
     def take_card(self) -> None:
         self._hand_out_card(PlayerNames.PLAYER)
-
-        if len(self._game[PlayerNames.PLAYER.value]['deck']) == MAX_CARDS_NUMBER_ON_HAND:
-            self.finish_game()
+        self._game[PlayerNames.PLAYER.value]['is_full'] = len(
+            self._game[PlayerNames.PLAYER.value]['deck']) == MAX_CARDS_NUMBER_ON_HAND
 
     def finish_game(self) -> None:
         self._game['stage'] = GameStages.FINISHED
@@ -52,11 +51,12 @@ class Model(Observable):
             self._game[PlayerNames.PLAYER.value]['deck'])
         self._game['bank'] = 0
         self._game['winner'] = None
-        self._game['winnings'] = None
+        self._game['winnings'] = 0
         self._game[PlayerNames.SKYNET.value]['deck'].clear()
         self._game[PlayerNames.SKYNET.value]['score'] = 0
         self._game[PlayerNames.PLAYER.value]['deck'].clear()
         self._game[PlayerNames.PLAYER.value]['score'] = 0
+        self._game[PlayerNames.PLAYER.value]['is_full'] = False
 
     def _hand_out_cards_to_skynet(self) -> None:
         self._hand_out_card(PlayerNames.SKYNET)
