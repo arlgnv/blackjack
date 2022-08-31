@@ -1,11 +1,11 @@
-from observable.observable import Observable
-from layers.model.types import Game, GameStages, PlayerNames
+from observable import Observable
+from layers.model import Game, GameStages, PlayerNames
 
-from layers.view.constants import WINNER_TO_DISPLAYED_WINNER
+from .constants import WINNER_TO_DISPLAYED_WINNER
 
 
 class View(Observable):
-    def __init__(self, game: Game):
+    def __init__(self, game: Game) -> None:
         super().__init__()
 
         with open('src/messages/welcome.txt', 'r', encoding='utf-8') as welcome_message:
@@ -13,7 +13,7 @@ class View(Observable):
 
         self.display_game_status(game)
 
-    def display_game_status(self, game: Game):
+    def display_game_status(self, game: Game) -> None:
         match game['stage']:
             case GameStages.GAME_STARTING_IS_AWAITED.value:
                 self._request_game_starting()
@@ -27,15 +27,15 @@ class View(Observable):
             case _:
                 pass
 
-    def _request_game_starting(self):
+    def _request_game_starting(self) -> None:
         if self._check_if_player_response_affirmative(input('Сыграем? [y/n] ').lower()):
             self.notify('gameStarted')
 
-    def _request_bet(self, game: Game):
+    def _request_bet(self, game: Game) -> None:
         self.notify('betMade', int(
             input(f'Твоя ставка(макс. {game["player"]["money"]}): ')))
 
-    def _request_card_taking(self):
+    def _request_card_taking(self) -> None:
         if self._check_if_player_response_affirmative(input('Возьмем еще карту? [y/n] ').lower()):
             self.notify('cardTaken')
         else:

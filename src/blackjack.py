@@ -1,3 +1,3 @@
-from layers.presenter.presenter import Presenter
+from layers import Presenter
 
 Presenter()
