@@ -35,24 +35,28 @@ class Model(Observable):
 
     def finish_game(self) -> None:
         self._game['stage'] = GameStages.FINISHED.value
-        self._game['winner'] = self._get_winner()
 
-    def reset_game_state(self) -> None:
-        self._game['deck'].extend(
-            self._game[PlayerNames.PLAYER.value]['deck'])
+        winner = self._get_winner()
+        if winner:
+            winnings = self._game['bank'] * 2
+
+            self._game['winner'] = winner
+            self._game['winnings'] = winnings
+            self._game[winner]['money'] += winnings
+
+    def restart_game(self) -> None:
+        self._game['stage'] = GameStages.GAME_STARTING_IS_AWAITED.value
         self._game['deck'].extend(
             self._game[PlayerNames.SKYNET.value]['deck'])
-
-        winner = self._game['winner']
-        if winner:
-            self._game[winner]['money'] += self._game['bank'] * 2
-        self._game['winner'] = None
-
+        self._game['deck'].extend(
+            self._game[PlayerNames.PLAYER.value]['deck'])
         self._game['bank'] = 0
-        self._game[PlayerNames.PLAYER.value]['deck'].clear()
-        self._game[PlayerNames.PLAYER.value]['score'] = 0
+        self._game['winner'] = None
+        self._game['winnings'] = None
         self._game[PlayerNames.SKYNET.value]['deck'].clear()
         self._game[PlayerNames.SKYNET.value]['score'] = 0
+        self._game[PlayerNames.PLAYER.value]['deck'].clear()
+        self._game[PlayerNames.PLAYER.value]['score'] = 0
 
     def _hand_out_cards_to_skynet(self) -> None:
         self._hand_out_card(PlayerNames.SKYNET.value)

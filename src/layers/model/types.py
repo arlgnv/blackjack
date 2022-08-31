@@ -28,5 +28,6 @@ class Game(TypedDict):
     deck: list[int]
     bank: int
     winner: Optional[PlayerName]
+    winnings: Optional[int]
     skynet: Player
     player: Player

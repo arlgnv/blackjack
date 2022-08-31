@@ -30,7 +30,7 @@ class View(Observable):
 
     def _request_bet(self, game: Game) -> None:
         self.notify(EventNames.BET_MADE.value, int(
-            input(f'Твоя ставка(макс. {game["player"]["money"]}): ')))
+            input(f'Твоя ставка(макс. {game[PlayerNames.PLAYER.value]["money"]}): ')))
 
     def _request_card_taking(self) -> None:
         if self._check_if_player_response_affirmative(input('Возьмем еще карту? [y/n] ').lower()):
@@ -53,6 +53,7 @@ class View(Observable):
     def _print_game_result(self, game: Game) -> None:
         print(f'''
 Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner']] if game['winner'] else 'Ничья'}
+Выигрыш: {game['winnings'] or '0'}
 ===============
 Твои карты: {game[PlayerNames.PLAYER.value]['deck']}
 Твои очки: {game[PlayerNames.PLAYER.value]['score']}

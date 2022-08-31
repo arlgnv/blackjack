@@ -7,6 +7,7 @@ DEFAULT_STATE: Game = {
     'deck': DECK.copy(),
     'bank': 0,
     'winner': None,
+    'winnings': None,
     'skynet': {
         'deck': [],
         'score': 0,

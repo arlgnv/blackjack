@@ -35,4 +35,5 @@ class Presenter:
     def _handle_game_finish(self) -> None:
         self._model.finish_game()
         self._view.display_game_status(self._model.get_game_state())
-        self._model.reset_game_state()
+        self._model.restart_game()
+        self._view.display_game_status(self._model.get_game_state())
