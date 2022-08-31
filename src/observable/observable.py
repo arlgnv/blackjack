@@ -15,7 +15,7 @@ class Observable:
 
     def notify(self, event_name: EventName, args: Optional[Any] = None) -> None:
         for callback in self._observers[event_name]:
-            if args:
-                callback(args)
-            else:
+            if args == None:
                 callback()
+            else:
+                callback(args)
