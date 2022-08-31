@@ -1,8 +1,9 @@
+from typing import Any
 import random
 
 from observable import Observable
 
-from .types import Game, GameStages, PlayerNames, PlayerName
+from .types import Game, GameStages, PlayerNames
 from .constants import DEFAULT_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND
 
 
@@ -18,30 +19,24 @@ class Model(Observable):
     def start_game(self) -> None:
         self._game['stage'] = GameStages.BET_IS_AWAITED
 
-    def make_bet(self, amount: int) -> None:
-        self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
-        self._game['bank'] = amount
-        self._game[PlayerNames.PLAYER.value]['money'] -= amount
-
+        self._make_bet_for_skynet()
         self._hand_out_cards_to_skynet()
-        self._hand_out_card(PlayerNames.PLAYER)
+        self.hand_out_card_to_player()
+        self.hand_out_card_to_player()
+
+    def make_bet_for_player(self, amount: int):
+        self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
+        self._make_bet(PlayerNames.PLAYER, amount)
+
+    def hand_out_card_to_player(self) -> None:
         self._hand_out_card(PlayerNames.PLAYER)
 
-    def take_card(self) -> None:
-        self._hand_out_card(PlayerNames.PLAYER)
-        self._game[PlayerNames.PLAYER.value]['is_full'] = len(
-            self._game[PlayerNames.PLAYER.value]['deck']) == MAX_CARDS_NUMBER_ON_HAND
+        if self._check_if_player_full(PlayerNames.PLAYER):
+            self.finish_game()
 
     def finish_game(self) -> None:
         self._game['stage'] = GameStages.FINISHED
-
-        winner = self._determine_winner()
-        if winner:
-            winnings = self._game['bank'] * 2
-
-            self._game['winner'] = winner
-            self._game['winnings'] = winnings
-            self._game[winner.value]['money'] += winnings
+        self._game['winner'] = self._determine_winner()
 
     def restart_game(self) -> None:
         self._game['stage'] = GameStages.GAME_STARTING_IS_AWAITED
@@ -49,21 +44,39 @@ class Model(Observable):
             self._game[PlayerNames.SKYNET.value]['deck'])
         self._game['deck'].extend(
             self._game[PlayerNames.PLAYER.value]['deck'])
+
+        bank = self._game['bank']
+        winner = self._game['winner']
+        if winner:
+            self._game[winner.value]['money'] += bank
+        else:
+            winnings = int(bank / 2)
+            self._game[PlayerNames.SKYNET.value]['money'] += winnings
+            self._game[PlayerNames.PLAYER.value]['money'] += winnings
+
         self._game['bank'] = 0
         self._game['winner'] = None
-        self._game['winnings'] = 0
+
         self._game[PlayerNames.SKYNET.value]['deck'].clear()
         self._game[PlayerNames.SKYNET.value]['score'] = 0
         self._game[PlayerNames.PLAYER.value]['deck'].clear()
         self._game[PlayerNames.PLAYER.value]['score'] = 0
         self._game[PlayerNames.PLAYER.value]['is_full'] = False
 
+    def _make_bet_for_skynet(self) -> None:
+        self._make_bet(PlayerNames.SKYNET, random.randint(
+            0, self._game[PlayerNames.SKYNET.value]['money']))
+
     def _hand_out_cards_to_skynet(self) -> None:
         self._hand_out_card(PlayerNames.SKYNET)
         self._hand_out_card(PlayerNames.SKYNET)
 
-        while random.randint(0, 1) == 0 and len(self._game[PlayerNames.SKYNET.value]['deck']) < MAX_CARDS_NUMBER_ON_HAND and self._game[PlayerNames.SKYNET.value]['score'] < 20:
+        while random.choice((True, False)) and not self._check_if_player_full(PlayerNames.SKYNET) and self._game[PlayerNames.SKYNET.value]['score'] < 20:
             self._hand_out_card(PlayerNames.SKYNET)
+
+    def _make_bet(self, player_name: PlayerNames, amount: int) -> None:
+        self._game[player_name.value]['money'] -= amount
+        self._game['bank'] += amount
 
     def _hand_out_card(self, player_name: PlayerNames) -> None:
         card = self._game['deck'].pop(
@@ -72,7 +85,7 @@ class Model(Observable):
         self._game[player_name.value]['deck'].append(card)
         self._game[player_name.value]['score'] += card
 
-    def _determine_winner(self) -> PlayerName | None:
+    def _determine_winner(self) -> PlayerNames | None:
         skynet_score = self._game[PlayerNames.SKYNET.value]['score']
         player_score = self._game[PlayerNames.PLAYER.value]['score']
 
@@ -80,3 +93,7 @@ class Model(Observable):
             return None
 
         return PlayerNames.SKYNET if abs(skynet_score - WIN_SCORE) < abs(player_score - WIN_SCORE) else PlayerNames.PLAYER
+
+    def _check_if_player_full(self, player_name: PlayerNames) -> bool:
+        return len(
+            self._game[player_name.value]['deck']) == MAX_CARDS_NUMBER_ON_HAND

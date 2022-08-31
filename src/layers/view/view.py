@@ -42,7 +42,7 @@ class View(Observable):
         if self._check_if_player_answer_affirmative(input('Возьмем еще карту? [y/n] ')):
             self.notify(EventNames.CARD_TAKEN)
         else:
-            self.notify(EventNames.ENOUGH_SAID)
+            self.notify(EventNames.CARD_REJECTED)
 
     def _check_if_player_answer_affirmative(self, answer: str) -> bool:
         return answer in AFFIRMATIVE_PLAYER_ANSWERS
@@ -59,11 +59,12 @@ class View(Observable):
     def _print_game_result(self, game: Game) -> None:
         print(f'''
 Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner'].value] if game['winner'] else 'Ничья'}
-Выигрыш: {game['winnings'] or '0'}
-===============
-Твои карты: {game[PlayerNames.PLAYER.value]['deck']}
-Твои очки: {game[PlayerNames.PLAYER.value]['score']}
-===============
-Карты компьютера: {game[PlayerNames.SKYNET.value]['deck']}
-Очки компьютера: {game[PlayerNames.SKYNET.value]['score']}
+===================
+Твой результат:
+  Карты - {game[PlayerNames.PLAYER.value]['deck']}
+  Очки - {game[PlayerNames.PLAYER.value]['score']}
+===================
+Результат Skynet:
+  Карты - {game[PlayerNames.SKYNET.value]['deck']}
+  Очки - {game[PlayerNames.SKYNET.value]['score']}
 ''')

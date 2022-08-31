@@ -6,10 +6,9 @@ class EventNames(Enum):
     GAME_STARTED = 'gameStarted'
     BET_MADE = 'betMade'
     CARD_TAKEN = 'cardTaken'
-    ENOUGH_SAID = 'enoughSaid'
-    GAME_FINISHED = 'gameFinished'
+    CARD_REJECTED = 'cardRejected'
 
 
 EventName = Literal[EventNames.GAME_STARTED, EventNames.BET_MADE,
-                    EventNames.CARD_TAKEN, EventNames.ENOUGH_SAID, EventNames.GAME_FINISHED]
+                    EventNames.CARD_TAKEN, EventNames.CARD_REJECTED]
 Observers = dict[EventName, list[Callable[..., None]]]
