@@ -21,6 +21,8 @@ class Presenter:
                              self._handle_card_take)
         self._view.subscribe(EventNames.CARD_REJECTED,
                              self._handle_card_reject)
+        self._view.subscribe(EventNames.GAME_RESTARTED,
+                             self._handle_game_restart)
 
     def _handle_game_start(self) -> None:
         self._model.start_game()
@@ -33,13 +35,18 @@ class Presenter:
     def _handle_card_take(self) -> None:
         self._model.hand_out_card_to_player()
         game_state = self._model.get_game_state()
-        self._view.display_game_status(game_state)
 
         if game_state['stage'] == GameStages.FINISHED:
             self._saver.save_game(game_state)
 
+        self._view.display_game_status(game_state)
+
     def _handle_card_reject(self) -> None:
         self._model.finish_game()
         game_state = self._model.get_game_state()
-        self._view.display_game_status(game_state)
         self._saver.save_game(game_state)
+        self._view.display_game_status(game_state)
+
+    def _handle_game_restart(self) -> None:
+        self._model.restart_game()
+        self._view.display_game_status(self._model.get_game_state())

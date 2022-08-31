@@ -5,18 +5,16 @@ from .types import Game, GameStages
 DEFAULT_STATE: Game = {
     'stage': GameStages.GAME_STARTING_IS_AWAITED,
     'deck': DECK.copy(),
-    'bank': 0,
+    'bank': 10,
     'winner': None,
     'skynet': {
         'money': 0,
         'deck': [],
-        'is_full': False,
         'score': 0,
     },
     'player': {
-        'money': 10,
+        'money': 0,
         'deck': [],
-        'is_full': False,
         'score': 0,
     },
 }

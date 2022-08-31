@@ -18,7 +18,6 @@ class Player(TypedDict):
     money: int
     deck: list[int]
     score: int
-    is_full: bool
 
 
 class Game(TypedDict):

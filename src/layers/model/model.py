@@ -1,4 +1,3 @@
-from typing import Any
 import random
 
 from observable import Observable
@@ -39,11 +38,14 @@ class Model(Observable):
         self._game['winner'] = self._determine_winner()
 
     def restart_game(self) -> None:
-        self._game['stage'] = GameStages.GAME_STARTING_IS_AWAITED
         self._game['deck'].extend(
             self._game[PlayerNames.SKYNET.value]['deck'])
         self._game['deck'].extend(
             self._game[PlayerNames.PLAYER.value]['deck'])
+        self._game[PlayerNames.SKYNET.value]['deck'].clear()
+        self._game[PlayerNames.SKYNET.value]['score'] = 0
+        self._game[PlayerNames.PLAYER.value]['deck'].clear()
+        self._game[PlayerNames.PLAYER.value]['score'] = 0
 
         bank = self._game['bank']
         winner = self._game['winner']
@@ -53,15 +55,10 @@ class Model(Observable):
             winnings = int(bank / 2)
             self._game[PlayerNames.SKYNET.value]['money'] += winnings
             self._game[PlayerNames.PLAYER.value]['money'] += winnings
-
         self._game['bank'] = 0
         self._game['winner'] = None
 
-        self._game[PlayerNames.SKYNET.value]['deck'].clear()
-        self._game[PlayerNames.SKYNET.value]['score'] = 0
-        self._game[PlayerNames.PLAYER.value]['deck'].clear()
-        self._game[PlayerNames.PLAYER.value]['score'] = 0
-        self._game[PlayerNames.PLAYER.value]['is_full'] = False
+        self.start_game()
 
     def _make_bet_for_skynet(self) -> None:
         self._make_bet(PlayerNames.SKYNET, random.randint(

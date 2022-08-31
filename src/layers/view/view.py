@@ -21,6 +21,7 @@ class View(Observable):
                 self._request_card_taking()
             case GameStages.FINISHED:
                 self._print_game_result(game)
+                self._request_game_restart()
             case _:
                 pass
 
@@ -29,20 +30,28 @@ class View(Observable):
             self.notify(EventNames.GAME_STARTED)
 
     def _request_bet(self, game: Game) -> None:
+        max_bet = game[PlayerNames.PLAYER.value]['money']
+
         while True:
-            bet = input(
-                f'Твоя ставка(макс. {game[PlayerNames.PLAYER.value]["money"]}): ')
+            bet = input(f'Твоя ставка(макс. {max_bet}): ')
 
             if bet.isdigit():
-                break
+                bet_as_int = int(bet)
 
-        self.notify(EventNames.BET_MADE, int(bet))
+                if bet_as_int <= max_bet:
+                    break
+
+        self.notify(EventNames.BET_MADE, bet_as_int)
 
     def _request_card_taking(self) -> None:
         if self._check_if_player_answer_affirmative(input('Возьмем еще карту? [y/n] ')):
             self.notify(EventNames.CARD_TAKEN)
         else:
             self.notify(EventNames.CARD_REJECTED)
+
+    def _request_game_restart(self) -> None:
+        if self._check_if_player_answer_affirmative(input('Сыграем еще разок? [y/n] ')):
+            self.notify(EventNames.GAME_RESTARTED)
 
     def _check_if_player_answer_affirmative(self, answer: str) -> bool:
         return answer in AFFIRMATIVE_PLAYER_ANSWERS
@@ -52,8 +61,10 @@ class View(Observable):
 
     def _print_player_result(self, game: Game) -> None:
         print(f'''
+===================
 Твои карты: {game[PlayerNames.PLAYER.value]['deck']}
 Твои очки: {game[PlayerNames.PLAYER.value]['score']}
+===================
 ''')
 
     def _print_game_result(self, game: Game) -> None:

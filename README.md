@@ -9,4 +9,4 @@
 
 Linux:
 
-`git clone https://gitlab.com/alagunoff/blackjack.git && cd blackjack && python3 src/blackjack.py`
+`git clone https://gitlab.com/alagunoff/blackjack.git && python3 blackjack/src/blackjack.py`
