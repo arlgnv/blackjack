@@ -2,7 +2,6 @@ from enum import Enum
 from typing import TypedDict, Optional, Literal
 
 PlayerName = Literal['skynet', 'player']
-Winner = PlayerName | Literal['draw']
 
 
 class GameStages(Enum):
@@ -28,6 +27,6 @@ class Game(TypedDict):
                    'betIsAwaited', 'cardTakingIsAwaited', 'finished']
     deck: list[int]
     bank: int
-    winner: Optional[Winner]
+    winner: Optional[PlayerName]
     skynet: Player
     player: Player

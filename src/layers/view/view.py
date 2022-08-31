@@ -1,17 +1,14 @@
-from observable import Observable
+from observable import Observable, EventNames
 from layers.model import Game, GameStages, PlayerNames
 
-from .constants import WINNER_TO_DISPLAYED_WINNER
+from .constants import WINNER_TO_DISPLAYED_WINNER, MESSAGES
 
 
 class View(Observable):
-    def __init__(self, game: Game) -> None:
+    def __init__(self) -> None:
         super().__init__()
 
-        with open('src/messages/welcome.txt', 'r', encoding='utf-8') as welcome_message:
-            print(welcome_message.read())
-
-        self.display_game_status(game)
+        self._print_welcome()
 
     def display_game_status(self, game: Game) -> None:
         match game['stage']:
@@ -29,20 +26,23 @@ class View(Observable):
 
     def _request_game_starting(self) -> None:
         if self._check_if_player_response_affirmative(input('Сыграем? [y/n] ').lower()):
-            self.notify('gameStarted')
+            self.notify(EventNames.GAME_STARTED.value)
 
     def _request_bet(self, game: Game) -> None:
-        self.notify('betMade', int(
+        self.notify(EventNames.BET_MADE.value, int(
             input(f'Твоя ставка(макс. {game["player"]["money"]}): ')))
 
     def _request_card_taking(self) -> None:
         if self._check_if_player_response_affirmative(input('Возьмем еще карту? [y/n] ').lower()):
-            self.notify('cardTaken')
+            self.notify(EventNames.CARD_TAKEN.value)
         else:
-            self.notify('gameFinished')
+            self.notify(EventNames.GAME_FINISHED.value)
 
     def _check_if_player_response_affirmative(self, response: str) -> bool:
         return response in ('', 'y')
+
+    def _print_welcome(self) -> None:
+        print(MESSAGES['welcome'])
 
     def _print_player_result(self, game: Game) -> None:
         print(f'''
@@ -52,7 +52,7 @@ class View(Observable):
 
     def _print_game_result(self, game: Game) -> None:
         print(f'''
-Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner']] if game['winner'] else ''}
+Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner']] if game['winner'] else 'Ничья'}
 ===============
 Твои карты: {game[PlayerNames.PLAYER.value]['deck']}
 Твои очки: {game[PlayerNames.PLAYER.value]['score']}

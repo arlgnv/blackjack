@@ -1,3 +1,5 @@
+from observable import EventNames
+
 from ..model import Model
 from ..view import View
 
@@ -5,11 +7,18 @@ from ..view import View
 class Presenter:
     def __init__(self) -> None:
         self._model = Model()
-        self._view = View(self._model.get_game_state())
-        self._view.subscribe('gameStarted', self._handle_game_start)
-        self._view.subscribe('betMade', self._handle_bet_make)
-        self._view.subscribe('cardTaken', self._handle_card_take)
-        self._view.subscribe('gameFinished', self._handle_game_finish)
+        self._view = View()
+        self._subscribe_to_view_events()
+        self._view.display_game_status(self._model.get_game_state())
+
+    def _subscribe_to_view_events(self) -> None:
+        self._view.subscribe(EventNames.GAME_STARTED.value,
+                             self._handle_game_start)
+        self._view.subscribe(EventNames.BET_MADE.value, self._handle_bet_make)
+        self._view.subscribe(EventNames.CARD_TAKEN.value,
+                             self._handle_card_take)
+        self._view.subscribe(EventNames.GAME_FINISHED.value,
+                             self._handle_game_finish)
 
     def _handle_game_start(self) -> None:
         self._model.start_game()

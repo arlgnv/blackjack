@@ -2,8 +2,8 @@ import random
 
 from observable import Observable
 
-from .types import Game, GameStages, PlayerNames, PlayerName, Winner
-from .constants import DEFAULT_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND, DRAW
+from .types import Game, GameStages, PlayerNames, PlayerName
+from .constants import DEFAULT_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND
 
 
 class Model(Observable):
@@ -44,7 +44,7 @@ class Model(Observable):
             self._game[PlayerNames.SKYNET.value]['deck'])
 
         winner = self._game['winner']
-        if winner and winner != DRAW:
+        if winner:
             self._game[winner]['money'] += self._game['bank'] * 2
         self._game['winner'] = None
 
@@ -68,11 +68,11 @@ class Model(Observable):
         self._game[player_name]['deck'].append(card)
         self._game[player_name]['score'] += card
 
-    def _get_winner(self) -> Winner:
+    def _get_winner(self) -> PlayerName | None:
         skynet_score = self._game[PlayerNames.SKYNET.value]['score']
         player_score = self._game[PlayerNames.PLAYER.value]['score']
 
         if skynet_score == player_score:
-            return DRAW
+            return None
 
         return PlayerNames.SKYNET.value if abs(skynet_score - WIN_SCORE) < abs(player_score - WIN_SCORE) else PlayerNames.PLAYER.value
