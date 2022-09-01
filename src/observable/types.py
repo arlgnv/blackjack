@@ -1,15 +1,12 @@
-from enum import Enum
 from typing import Literal, Callable
 
-
-class EventNames(Enum):
-    GAME_STARTED = 'gameStarted'
-    BET_MADE = 'betMade'
-    CARD_TAKEN = 'cardTaken'
-    CARD_REJECTED = 'cardRejected'
-    GAME_RESTARTED = 'gameRestarted'
+from layers.view import EventNames as ViwEventNames
+from layers.model import EventNames as ModelEventNames
 
 
-EventName = Literal[EventNames.GAME_STARTED, EventNames.BET_MADE,
-                    EventNames.CARD_TAKEN, EventNames.CARD_REJECTED, EventNames.GAME_RESTARTED]
+EventName = Literal[ViwEventNames.GAME_STARTED, ViwEventNames.BET_MADE,
+                    ViwEventNames.CARD_TAKEN, ViwEventNames.CARD_REJECTED, ViwEventNames.GAME_RESTARTED,
+                    ModelEventNames.GAME_STARTED, ModelEventNames.BET_MADE,
+                    ModelEventNames.CARD_ISSUED, ModelEventNames.GAME_FINISHED, ModelEventNames.GAME_RESTARTED,
+                    ]
 Observers = dict[EventName, list[Callable[..., None]]]

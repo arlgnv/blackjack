@@ -2,8 +2,8 @@ from random import randint, choice, randrange
 
 from observable import Observable
 
-from .constants import DEFAULT_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND
-from .types import Game, GameStages, PlayerNames
+from .constants import DEFAULT_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND, MIN_BET, SCORE_DESERVING_TAKING_RISK, SCORE_DONT_DESERVING_TAKING_RISK
+from .types import Game, GameStages, PlayerNames, EventNames
 
 
 class Model(Observable):
@@ -20,22 +20,30 @@ class Model(Observable):
 
         self._make_bet_for_computer()
         self._hand_out_cards_to_computer()
-        self.hand_out_card_to_player()
-        self.hand_out_card_to_player()
+        self._hand_out_card(PlayerNames.HUMAN)
+        self._hand_out_card(PlayerNames.HUMAN)
+
+        self.notify(EventNames.GAME_STARTED, self._game)
 
     def make_bet_for_player(self, amount: int) -> None:
         self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
         self._make_bet(PlayerNames.HUMAN, amount)
 
+        self.notify(EventNames.BET_MADE, self._game)
+
     def hand_out_card_to_player(self) -> None:
         self._hand_out_card(PlayerNames.HUMAN)
 
-        if not self._check_can_player_take_card(PlayerNames.HUMAN):
+        if self._check_can_player_take_card(PlayerNames.HUMAN):
+            self.notify(EventNames.CARD_ISSUED, self._game)
+        else:
             self.finish_game()
 
     def finish_game(self) -> None:
         self._game['stage'] = GameStages.FINISHED
         self._game['winner'] = self._determine_winner()
+
+        self.notify(EventNames.GAME_FINISHED, self._game)
 
     def restart_game(self) -> None:
         self._take_cards_from_player(PlayerNames.COMPUTER)
@@ -44,11 +52,10 @@ class Model(Observable):
         self.start_game()
 
     def _make_bet_for_computer(self) -> None:
-        min_bet = 0
         max_bet = min([self._game[PlayerNames.COMPUTER.value]
                       ['money'], self._game[PlayerNames.HUMAN.value]['money']])
 
-        self._make_bet(PlayerNames.COMPUTER, randint(min_bet, max_bet))
+        self._make_bet(PlayerNames.COMPUTER, randint(MIN_BET, max_bet))
 
     def _hand_out_cards_to_computer(self) -> None:
         self._hand_out_card(PlayerNames.COMPUTER)
@@ -61,11 +68,11 @@ class Model(Observable):
         computer_score = self._game[PlayerNames.COMPUTER.value]['score']
         can_computer_take_card = self._check_can_player_take_card(
             PlayerNames.COMPUTER)
-        is_it_stupid_to_take_a_card = computer_score > 19
+        is_it_stupid_to_take_a_card = computer_score > SCORE_DONT_DESERVING_TAKING_RISK
         if not can_computer_take_card or is_it_stupid_to_take_a_card:
             return False
 
-        if computer_score < 16:
+        if computer_score < SCORE_DESERVING_TAKING_RISK:
             return True
 
         return choice((True, False))

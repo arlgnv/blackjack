@@ -1,1 +1,1 @@
-from .view import View
+from .types import *

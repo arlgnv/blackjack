@@ -1,7 +1,8 @@
-from observable import Observable, EventNames
+from observable import Observable
 from layers.model import Game, GameStages, PlayerNames
 
 from .constants import WINNER_TO_DISPLAYED_WINNER, MESSAGES, AFFIRMATIVE_PLAYER_ANSWERS
+from .types import EventNames
 
 
 class View(Observable):
@@ -10,9 +11,9 @@ class View(Observable):
 
         print(MESSAGES['welcome'])
 
-    def display_game_status(self, game: Game) -> None:
+    def update(self, game: Game) -> None:
         match game['stage']:
-            case GameStages.GAME_STARTING_IS_AWAITED:
+            case GameStages.STARTING_IS_AWAITED:
                 self._request_game_starting()
             case GameStages.BET_IS_AWAITED:
                 self._print_player_result(game)

@@ -2,8 +2,16 @@ from typing import TypedDict, Optional, Literal
 from enum import Enum
 
 
+class EventNames(Enum):
+    GAME_STARTED = 'gameStarted'
+    BET_MADE = 'betMade'
+    CARD_ISSUED = 'cardIssued'
+    GAME_FINISHED = 'gameFinished'
+    GAME_RESTARTED = 'gameRestarted'
+
+
 class GameStages(str, Enum):
-    GAME_STARTING_IS_AWAITED = 'gameStartingIsAwaited'
+    STARTING_IS_AWAITED = 'startingIsAwaited'
     BET_IS_AWAITED = 'betIsAwaited'
     CARD_TAKING_IS_AWAITED = 'cardTakingIsAwaited'
     FINISHED = 'finished'
@@ -22,7 +30,7 @@ class Player(TypedDict):
 
 class Game(TypedDict):
     stage: Literal[
-        GameStages.GAME_STARTING_IS_AWAITED,
+        GameStages.STARTING_IS_AWAITED,
         GameStages.BET_IS_AWAITED,
         GameStages.CARD_TAKING_IS_AWAITED,
         GameStages.FINISHED
