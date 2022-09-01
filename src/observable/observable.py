@@ -7,7 +7,7 @@ class Observable:
     def __init__(self) -> None:
         self._observers: Observers = {}
 
-    def subscribe(self, event_name: EventName, callback: Callable[..., None]) -> None:
+    def on(self, event_name: EventName, callback: Callable[..., None]) -> None:
         if event_name in self._observers:
             self._observers[event_name].append(callback)
         else:

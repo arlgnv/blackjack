@@ -18,26 +18,20 @@ class Presenter:
         self._saver = Saver()
 
     def _subscribe_to_view_events(self) -> None:
-        self._view.subscribe(ViewEventNames.GAME_STARTED,
-                             self._handle_view_game_start)
-        self._view.subscribe(ViewEventNames.BET_MADE,
-                             self._handle_view_bet_make)
-        self._view.subscribe(ViewEventNames.CARD_TAKEN,
-                             self._handle_card_take)
-        self._view.subscribe(ViewEventNames.CARD_REJECTED,
-                             self._handle_card_reject)
-        self._view.subscribe(ViewEventNames.GAME_RESTARTED,
-                             self._handle_view_game_restart)
+        self._view.on(ViewEventNames.GAME_STARTED,
+                      self._handle_view_game_start)
+        self._view.on(ViewEventNames.BET_MADE, self._handle_view_bet_make)
+        self._view.on(ViewEventNames.CARD_TAKEN, self._handle_card_take)
+        self._view.on(ViewEventNames.CARD_REJECTED, self._handle_card_reject)
+        self._view.on(ViewEventNames.GAME_RESTARTED,
+                      self._handle_view_game_restart)
 
     def _subscribe_to_model_events(self) -> None:
-        self._model.subscribe(ModelEventNames.GAME_STARTED,
-                              self._handle_model_game_started)
-        self._model.subscribe(ModelEventNames.BET_MADE,
-                              self._handle_model_bet_make)
-        self._model.subscribe(ModelEventNames.CARD_ISSUED,
-                              self._handle_card_issue)
-        self._model.subscribe(ModelEventNames.GAME_FINISHED,
-                              self._handle_game_finish)
+        self._model.on(ModelEventNames.GAME_STARTED,
+                       self._handle_model_game_started)
+        self._model.on(ModelEventNames.BET_MADE, self._handle_model_bet_make)
+        self._model.on(ModelEventNames.CARD_ISSUED, self._handle_card_issue)
+        self._model.on(ModelEventNames.GAME_FINISHED, self._handle_game_finish)
 
     def _handle_view_game_start(self) -> None:
         self._model.start_game()
