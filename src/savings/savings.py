@@ -12,19 +12,20 @@ class Savings:
         self._model = model
         self._subscribe_to_model_events()
 
-        self._file_path = f'{Path(__file__).parent}/savings.json'
+        self._savings_file_path = f'{Path(__file__).parent}/savings.json'
+        self._is_savings_file_exists = self._check_if_savings_file_exists()
 
-    def load_last_saved_game(self) -> Game | None:
-        if self._check_if_file_exists():
-            with open(self._file_path, 'r', encoding='utf-8') as savings_file:
-                saved_game = load(savings_file)[0]
+    def load_last_saving(self) -> Game | None:
+        if self._check_if_savings_file_exists():
+            with open(self._savings_file_path, 'r', encoding='utf-8') as savings_file:
+                last_saving = load(savings_file)[0]
                 winner: Literal['skynet',
-                                'player'] | None = saved_game['winner']
+                                'player'] | None = last_saving['winner']
 
                 if winner:
-                    saved_game['winner'] = PlayerNames(winner)
+                    last_saving['winner'] = PlayerNames(winner)
 
-                return saved_game
+                return last_saving
 
         return None
 
@@ -36,33 +37,54 @@ class Savings:
         self._model.on(ModelEventNames.GAME_FINISHED, self._handle_game_finish)
 
     def _save_game(self, game: Game) -> None:
-        if self._check_if_file_exists():
-            self._update_savings_file(game)
+        if self._check_if_savings_file_exists():
+            self._update_last_saving(game)
         else:
             self._create_savings_file(game)
 
     def _create_savings_file(self, game: Game) -> None:
-        with open(self._file_path, 'w', encoding='utf-8') as savings_file:
+        with open(self._savings_file_path, 'w', encoding='utf-8') as savings_file:
             dump([game], savings_file)
 
-    def _update_savings_file(self, game: Game) -> None:
-        with open(self._file_path, 'r', encoding='utf-8') as savings_file:
+        self._is_savings_file_exists = True
+
+    def _add_saving(self, game: Game) -> None:
+        with open(self._savings_file_path, 'r', encoding='utf-8') as savings_file:
             savings = load(savings_file)
             savings.insert(0, game)
-        with open(self._file_path, 'w', encoding='utf-8') as savings_file:
+        with open(self._savings_file_path, 'w', encoding='utf-8') as savings_file:
             dump(savings, savings_file)
 
-    def _check_if_file_exists(self) -> bool:
-        return path.exists(self._file_path)
+    def _update_last_saving(self, game: Game) -> None:
+        with open(self._savings_file_path, 'r', encoding='utf-8') as savings_file:
+            savings = load(savings_file)
+            savings[0] = game
+        with open(self._savings_file_path, 'w', encoding='utf-8') as savings_file:
+            dump(savings, savings_file)
+
+    def _check_if_savings_file_exists(self) -> bool:
+        return path.exists(self._savings_file_path)
 
     def _handle_model_game_start(self, game: Game) -> None:
-        self._save_game(game)
+        if self._is_savings_file_exists:
+            self._add_saving(game)
+        else:
+            self._create_savings_file(game)
 
     def _handle_model_bet_make(self, game: Game) -> None:
-        self._save_game(game)
+        if self._is_savings_file_exists:
+            self._update_last_saving(game)
+        else:
+            self._create_savings_file(game)
 
     def _handle_card_issue(self, game: Game) -> None:
-        self._save_game(game)
+        if self._is_savings_file_exists:
+            self._update_last_saving(game)
+        else:
+            self._create_savings_file(game)
 
     def _handle_game_finish(self, game: Game) -> None:
-        self._save_game(game)
+        if self._is_savings_file_exists:
+            self._update_last_saving(game)
+        else:
+            self._create_savings_file(game)
