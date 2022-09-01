@@ -82,7 +82,7 @@ class View(Observable):
     def _print_game_result(self, game: Game) -> None:
         print(f'''
 ===================
-Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner'].value] if game['winner'] else 'Ничья'}
+Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner'].value if game['winner'] else WINNER_TO_DISPLAYED_WINNER['draw']]}
 -------------------
 Твой результат:
   Карты - {game[PlayerNames.HUMAN.value]['deck']}
