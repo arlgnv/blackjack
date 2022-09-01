@@ -8,7 +8,7 @@ DEFAULT_STATE: Game = {
     'bank': 0,
     'winner': None,
     'skynet': {
-        'money': 10,
+        'money': 0,
         'deck': [],
         'score': 0,
         'wins': 0
