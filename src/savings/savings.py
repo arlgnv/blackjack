@@ -1,9 +1,8 @@
-from typing import Literal
 from pathlib import Path
 from os import path
 from json import load, dump
 
-from layers.model import Game, PlayerNames, EventNames as ModelEventNames
+from layers.model import Game, GameStages, PlayerNames, EventNames as ModelEventNames
 from layers.model.model import Model
 
 
@@ -16,15 +15,15 @@ class Savings:
         self._is_savings_file_exists = self._check_if_savings_file_exists()
 
     def load_last_saving(self) -> Game | None:
-        if self._check_if_savings_file_exists():
+        if self._is_savings_file_exists:
             with open(self._savings_file_path, 'r', encoding='utf-8') as savings_file:
                 last_saving = load(savings_file)[0]
-                winner: Literal['skynet',
-                                'player'] | None = last_saving['winner']
+                last_saving['stage'] = GameStages(last_saving['stage'])
 
+                winner = last_saving['winner']
                 if winner:
                     last_saving['winner'] = PlayerNames(winner)
-
+                print(last_saving)
                 return last_saving
 
         return None
@@ -37,7 +36,7 @@ class Savings:
         self._model.on(ModelEventNames.GAME_FINISHED, self._handle_game_finish)
 
     def _save_game(self, game: Game) -> None:
-        if self._check_if_savings_file_exists():
+        if self._is_savings_file_exists:
             self._update_last_saving(game)
         else:
             self._create_savings_file(game)

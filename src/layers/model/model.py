@@ -2,21 +2,15 @@ from random import randint, choice, randrange
 
 from observable import Observable
 
-from .constants import DEFAULT_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND, MIN_BET, SCORE_DESERVING_TAKING_RISK, SCORE_DONT_DESERVING_TAKING_RISK
+from .constants import WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND, MIN_BET, SCORE_DESERVING_TAKING_RISK, SCORE_DONT_DESERVING_TAKING_RISK
 from .types import Game, GameStages, PlayerNames, EventNames
 
 
 class Model(Observable):
-    def __init__(self) -> None:
-        super().__init__()
-
-        self._game = DEFAULT_STATE
-
-    def get_game_state(self) -> Game:
-        return self._game
-
-    def update_game_state(self, game: Game) -> None:
+    def set_game_state(self, game: Game) -> Game:
         self._game = game
+
+        return self._game
 
     def start_game(self) -> None:
         self._game['stage'] = GameStages.BET_IS_AWAITED

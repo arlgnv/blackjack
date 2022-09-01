@@ -62,16 +62,16 @@ class View(Observable):
     def _print_bet_preview(self, game: Game) -> None:
         print(f'''
 ===================
-Банк: {game['bank']}
+Банк: {game['bank']}{RUBLE_SIGN}
 -------------------
-Твои деньги: {game[PlayerNames.HUMAN.value]['money']}
+Твои деньги: {game[PlayerNames.HUMAN.value]['money']}{RUBLE_SIGN}
 ===================
 ''')
 
     def _print_player_result(self, game: Game) -> None:
         print(f'''
 ===================
-Банк: {game['bank']}
+Банк: {game['bank']}{RUBLE_SIGN}
 -------------------
 Твои деньги: {game[PlayerNames.HUMAN.value]['money']}{RUBLE_SIGN}
 Твои карты: {game[PlayerNames.HUMAN.value]['deck']}
