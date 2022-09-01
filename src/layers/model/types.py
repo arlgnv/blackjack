@@ -1,5 +1,5 @@
-from enum import Enum
 from typing import TypedDict, Optional, Literal
+from enum import Enum
 
 
 class GameStages(str, Enum):
@@ -10,8 +10,8 @@ class GameStages(str, Enum):
 
 
 class PlayerNames(str, Enum):
-    SKYNET = 'skynet'
-    PLAYER = 'player'
+    COMPUTER = 'skynet'
+    HUMAN = 'player'
 
 
 class Player(TypedDict):
@@ -21,8 +21,12 @@ class Player(TypedDict):
 
 
 class Game(TypedDict):
-    stage: Literal[GameStages.GAME_STARTING_IS_AWAITED,
-                   GameStages.BET_IS_AWAITED, GameStages.CARD_TAKING_IS_AWAITED, GameStages.FINISHED]
+    stage: Literal[
+        GameStages.GAME_STARTING_IS_AWAITED,
+        GameStages.BET_IS_AWAITED,
+        GameStages.CARD_TAKING_IS_AWAITED,
+        GameStages.FINISHED
+    ]
     deck: list[int]
     bank: int
     winner: Optional[PlayerNames]

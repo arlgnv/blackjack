@@ -8,7 +8,7 @@ class View(Observable):
     def __init__(self) -> None:
         super().__init__()
 
-        self._print_welcome()
+        print(MESSAGES['welcome'])
 
     def display_game_status(self, game: Game) -> None:
         match game['stage']:
@@ -30,15 +30,16 @@ class View(Observable):
             self.notify(EventNames.GAME_STARTED)
 
     def _request_bet(self, game: Game) -> None:
-        max_bet = game[PlayerNames.PLAYER.value]['money']
+        min_bet = game['bank']
+        max_bet = game[PlayerNames.HUMAN.value]['money']
 
         while True:
-            bet = input(f'Твоя ставка(макс. {max_bet}): ')
+            bet = input(f'Твоя ставка(мин. {min_bet}, макс. {max_bet}): ')
 
             if bet.isdigit():
                 bet_as_int = int(bet)
 
-                if bet_as_int <= max_bet:
+                if min_bet <= bet_as_int <= max_bet:
                     break
 
         self.notify(EventNames.BET_MADE, bet_as_int)
@@ -56,14 +57,11 @@ class View(Observable):
     def _check_if_player_answer_affirmative(self, answer: str) -> bool:
         return answer in AFFIRMATIVE_PLAYER_ANSWERS
 
-    def _print_welcome(self) -> None:
-        print(MESSAGES['welcome'])
-
     def _print_player_result(self, game: Game) -> None:
         print(f'''
 ===================
-Твои карты: {game[PlayerNames.PLAYER.value]['deck']}
-Твои очки: {game[PlayerNames.PLAYER.value]['score']}
+Твои карты: {game[PlayerNames.HUMAN.value]['deck']}
+Твои очки: {game[PlayerNames.HUMAN.value]['score']}
 ===================
 ''')
 
@@ -72,10 +70,10 @@ class View(Observable):
 Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner'].value] if game['winner'] else 'Ничья'}
 ===================
 Твой результат:
-  Карты - {game[PlayerNames.PLAYER.value]['deck']}
-  Очки - {game[PlayerNames.PLAYER.value]['score']}
+  Карты - {game[PlayerNames.HUMAN.value]['deck']}
+  Очки - {game[PlayerNames.HUMAN.value]['score']}
 ===================
 Результат Skynet:
-  Карты - {game[PlayerNames.SKYNET.value]['deck']}
-  Очки - {game[PlayerNames.SKYNET.value]['score']}
+  Карты - {game[PlayerNames.COMPUTER.value]['deck']}
+  Очки - {game[PlayerNames.COMPUTER.value]['score']}
 ''')
