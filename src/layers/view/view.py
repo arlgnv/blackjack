@@ -1,7 +1,7 @@
 from observable import Observable
 from layers.model import Game, GameStages, PlayerNames
 
-from .constants import WINNER_TO_DISPLAYED_WINNER, MESSAGES, AFFIRMATIVE_PLAYER_ANSWERS
+from .constants import WINNER_TO_DISPLAYED_WINNER, MESSAGES, AFFIRMATIVE_PLAYER_ANSWERS, RUBLE_SIGN
 from .types import EventNames
 
 
@@ -73,7 +73,7 @@ class View(Observable):
 ===================
 Банк: {game['bank']}
 -------------------
-Твои деньги: {game[PlayerNames.HUMAN.value]['money']}
+Твои деньги: {game[PlayerNames.HUMAN.value]['money']}{RUBLE_SIGN}
 Твои карты: {game[PlayerNames.HUMAN.value]['deck']}
 Твои очки: {game[PlayerNames.HUMAN.value]['score']}
 ===================
