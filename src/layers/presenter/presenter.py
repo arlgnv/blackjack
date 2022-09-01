@@ -1,21 +1,24 @@
-from saver import Saver
-
+from observable import Observable
 from layers.model import Game, EventNames as ModelEventNames
 from layers.model.model import Model
 from layers.view import EventNames as ViewEventNames
 from layers.view.view import View
 
+from .types import EventNames
 
-class Presenter:
+
+class Presenter(Observable):
     def __init__(self) -> None:
+        super().__init__()
+
         self._model = Model()
         self._subscribe_to_model_events()
 
         self._view = View()
         self._subscribe_to_view_events()
-        self._view.update(self._model.get_game_state())
 
-        self._saver = Saver()
+    def start(self) -> None:
+        self._view.update(self._model.get_game_state())
 
     def _subscribe_to_view_events(self) -> None:
         self._view.on(ViewEventNames.GAME_STARTED,
@@ -55,8 +58,9 @@ class Presenter:
         self._view.update(game)
 
     def _handle_game_finish(self, game: Game) -> None:
+        self.emit(EventNames.GAME_FINISHED, game)
+
         self._view.update(game)
-        self._saver.save_game(game)
 
     def _handle_view_game_restart(self) -> None:
         self._model.restart_game()

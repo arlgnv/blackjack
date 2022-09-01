@@ -13,7 +13,7 @@ class Observable:
         else:
             self._observers[event_name] = [callback]
 
-    def notify(self, event_name: EventName, args: Optional[Any] = None) -> None:
+    def emit(self, event_name: EventName, args: Optional[Any] = None) -> None:
         for callback in self._observers[event_name]:
             if args is None:
                 callback()

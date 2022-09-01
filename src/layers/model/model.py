@@ -23,19 +23,19 @@ class Model(Observable):
         self._hand_out_card(PlayerNames.HUMAN)
         self._hand_out_card(PlayerNames.HUMAN)
 
-        self.notify(EventNames.GAME_STARTED, self._game)
+        self.emit(EventNames.GAME_STARTED, self._game)
 
     def make_bet_for_player(self, amount: int) -> None:
         self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
         self._make_bet(PlayerNames.HUMAN, amount)
 
-        self.notify(EventNames.BET_MADE, self._game)
+        self.emit(EventNames.BET_MADE, self._game)
 
     def hand_out_card_to_player(self) -> None:
         self._hand_out_card(PlayerNames.HUMAN)
 
         if self._check_can_player_take_card(PlayerNames.HUMAN):
-            self.notify(EventNames.CARD_ISSUED, self._game)
+            self.emit(EventNames.CARD_ISSUED, self._game)
         else:
             self.finish_game()
 
@@ -47,7 +47,7 @@ class Model(Observable):
             self._game['winner'] = winner
             self._game[winner.value]['wins'] += 1
 
-        self.notify(EventNames.GAME_FINISHED, self._game)
+        self.emit(EventNames.GAME_FINISHED, self._game)
 
     def restart_game(self) -> None:
         self._take_cards_from_player(PlayerNames.COMPUTER)

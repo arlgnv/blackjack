@@ -1,11 +1,13 @@
 from typing import Literal, Callable
 
-from layers.view import EventNames as ViwEventNames
+from layers.view import EventNames as ViewEventNames
+from layers.presenter import EventNames as PresenterEventNames
 from layers.model import EventNames as ModelEventNames
 
 
-EventName = Literal[ViwEventNames.GAME_STARTED, ViwEventNames.BET_MADE,
-                    ViwEventNames.CARD_TAKEN, ViwEventNames.CARD_REJECTED, ViwEventNames.GAME_RESTARTED,
+EventName = Literal[ViewEventNames.GAME_STARTED, ViewEventNames.BET_MADE,
+                    ViewEventNames.CARD_TAKEN, ViewEventNames.CARD_REJECTED, ViewEventNames.GAME_RESTARTED,
+                    PresenterEventNames.GAME_FINISHED,
                     ModelEventNames.GAME_STARTED, ModelEventNames.BET_MADE,
                     ModelEventNames.CARD_ISSUED, ModelEventNames.GAME_FINISHED, ModelEventNames.GAME_RESTARTED,
                     ]
