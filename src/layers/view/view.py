@@ -6,14 +6,10 @@ from .types import EventNames
 
 
 class View(Observable):
-    def __init__(self) -> None:
-        super().__init__()
-
-        print(MESSAGES['welcome'])
-
     def update(self, game: Game) -> None:
         match game['stage']:
             case GameStages.STARTING_IS_AWAITED:
+                print(MESSAGES['welcome'])
                 self._request_game_starting()
             case GameStages.BET_IS_AWAITED:
                 self._print_bet_preview(game)
@@ -36,7 +32,8 @@ class View(Observable):
         max_bet = game[PlayerNames.HUMAN.value]['money']
 
         while True:
-            bet = input(f'Твоя ставка(мин. {min_bet}, макс. {max_bet}): ')
+            bet = input(
+                f'Твоя ставка(мин. {min_bet}{RUBLE_SIGN}, макс. {max_bet}{RUBLE_SIGN}): ')
 
             if bet.isdigit():
                 bet_as_int = int(bet)
