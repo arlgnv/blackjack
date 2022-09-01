@@ -30,7 +30,7 @@ class Model(Observable):
     def hand_out_card_to_player(self) -> None:
         self._hand_out_card(PlayerNames.HUMAN)
 
-        if self._check_can_player_take_card(PlayerNames.HUMAN):
+        if not self._check_can_player_take_card(PlayerNames.HUMAN):
             self.finish_game()
 
     def finish_game(self) -> None:

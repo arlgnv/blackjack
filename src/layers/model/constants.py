@@ -5,7 +5,7 @@ DECK = [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 6, 6, 6, 6, 7, 7,
 DEFAULT_STATE: Game = {
     'stage': GameStages.GAME_STARTING_IS_AWAITED,
     'deck': DECK.copy(),
-    'bank': 10,
+    'bank': 0,
     'winner': None,
     'skynet': {
         'money': 0,

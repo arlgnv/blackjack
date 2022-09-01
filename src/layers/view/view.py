@@ -15,6 +15,7 @@ class View(Observable):
             case GameStages.GAME_STARTING_IS_AWAITED:
                 self._request_game_starting()
             case GameStages.BET_IS_AWAITED:
+                self._print_player_result(game)
                 self._request_bet(game)
             case GameStages.CARD_TAKING_IS_AWAITED:
                 self._print_player_result(game)
@@ -26,7 +27,7 @@ class View(Observable):
                 pass
 
     def _request_game_starting(self) -> None:
-        if self._check_if_player_answer_affirmative(input('Сыграем? [y/n] ')):
+        if self._check_if_player_answer_affirmative(input('Попытать удачу? [y/n] ')):
             self.notify(EventNames.GAME_STARTED)
 
     def _request_bet(self, game: Game) -> None:
@@ -60,6 +61,9 @@ class View(Observable):
     def _print_player_result(self, game: Game) -> None:
         print(f'''
 ===================
+Банк: {game['bank']}
+-------------------
+Твои деньги: {game[PlayerNames.HUMAN.value]['money']}
 Твои карты: {game[PlayerNames.HUMAN.value]['deck']}
 Твои очки: {game[PlayerNames.HUMAN.value]['score']}
 ===================
@@ -67,13 +71,15 @@ class View(Observable):
 
     def _print_game_result(self, game: Game) -> None:
         print(f'''
-Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner'].value] if game['winner'] else 'Ничья'}
 ===================
+Победитель: {WINNER_TO_DISPLAYED_WINNER[game['winner'].value] if game['winner'] else 'Ничья'}
+-------------------
 Твой результат:
   Карты - {game[PlayerNames.HUMAN.value]['deck']}
   Очки - {game[PlayerNames.HUMAN.value]['score']}
-===================
+-------------------
 Результат Skynet:
   Карты - {game[PlayerNames.COMPUTER.value]['deck']}
   Очки - {game[PlayerNames.COMPUTER.value]['score']}
+===================
 ''')
