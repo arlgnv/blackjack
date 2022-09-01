@@ -1,7 +1,7 @@
 from typing import Literal
 from pathlib import Path
-import os
-import json
+from os import path
+from json import load, dump
 
 from layers.model import Game, PlayerNames, EventNames as ModelEventNames
 from layers.model.model import Model
@@ -14,10 +14,10 @@ class Savings:
 
         self._file_path = f'{Path(__file__).parent}/savings.json'
 
-    def load_game(self) -> Game | None:
+    def load_last_saved_game(self) -> Game | None:
         if self._check_if_file_exists():
             with open(self._file_path, 'r', encoding='utf-8') as savings_file:
-                saved_game = json.load(savings_file)[0]
+                saved_game = load(savings_file)[0]
                 winner: Literal['skynet',
                                 'player'] | None = saved_game['winner']
 
@@ -43,17 +43,17 @@ class Savings:
 
     def _create_savings_file(self, game: Game) -> None:
         with open(self._file_path, 'w', encoding='utf-8') as savings_file:
-            json.dump([game], savings_file)
+            dump([game], savings_file)
 
     def _update_savings_file(self, game: Game) -> None:
         with open(self._file_path, 'r', encoding='utf-8') as savings_file:
-            savings = json.load(savings_file)
+            savings = load(savings_file)
             savings.insert(0, game)
         with open(self._file_path, 'w', encoding='utf-8') as savings_file:
-            json.dump(savings, savings_file)
+            dump(savings, savings_file)
 
     def _check_if_file_exists(self) -> bool:
-        return os.path.exists(self._file_path)
+        return path.exists(self._file_path)
 
     def _handle_model_game_start(self, game: Game) -> None:
         self._save_game(game)

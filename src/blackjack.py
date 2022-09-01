@@ -11,10 +11,10 @@ class BlackJack:
         self._savings = Savings(self._model)
         self._presenter = Presenter(self._view, self._model)
 
-        saved_game = self._savings.load_game()
+        last_saved_game = self._savings.load_last_saved_game()
 
-        if saved_game:
-            self._model.update_game_state(saved_game)
+        if last_saved_game:
+            self._model.update_game_state(last_saved_game)
 
         self._view.update(self._model.get_game_state())
 

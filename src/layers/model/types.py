@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional, Literal
+from typing import TypedDict, Optional
 from enum import Enum
 
 
@@ -30,12 +30,7 @@ class Player(TypedDict):
 
 
 class Game(TypedDict):
-    stage: Literal[
-        GameStages.STARTING_IS_AWAITED,
-        GameStages.BET_IS_AWAITED,
-        GameStages.CARD_TAKING_IS_AWAITED,
-        GameStages.FINISHED
-    ]
+    stage: GameStages
     deck: list[int]
     bank: int
     winner: Optional[PlayerNames]
