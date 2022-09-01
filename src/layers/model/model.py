@@ -7,13 +7,10 @@ from .types import Game, GameStages, PlayerNames, EventNames
 
 
 class Model(Observable):
-    def __init__(self) -> None:
-        super().__init__()
+    def init_game(self, game: Game | None) -> None:
+        self._game = game or DEFAULT_STATE
 
-        self._game = DEFAULT_STATE
-
-    def get_game_state(self) -> Game:
-        return self._game
+        self.emit(EventNames.GAME_INITIALIZED, self._game)
 
     def start_game(self) -> None:
         self._game['stage'] = GameStages.BET_IS_AWAITED

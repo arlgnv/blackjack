@@ -17,8 +17,8 @@ class Presenter(Observable):
         self._view = View()
         self._subscribe_to_view_events()
 
-    def start(self) -> None:
-        self._view.update(self._model.get_game_state())
+    def init_model(self, saved_game: Game | None) -> None:
+        self._model.init_game(saved_game)
 
     def _subscribe_to_view_events(self) -> None:
         self._view.on(ViewEventNames.GAME_STARTED,
@@ -30,11 +30,16 @@ class Presenter(Observable):
                       self._handle_view_game_restart)
 
     def _subscribe_to_model_events(self) -> None:
+        self._model.on(ModelEventNames.GAME_INITIALIZED,
+                       self._handle_game_initialize)
         self._model.on(ModelEventNames.GAME_STARTED,
                        self._handle_model_game_started)
         self._model.on(ModelEventNames.BET_MADE, self._handle_model_bet_make)
         self._model.on(ModelEventNames.CARD_ISSUED, self._handle_card_issue)
         self._model.on(ModelEventNames.GAME_FINISHED, self._handle_game_finish)
+
+    def _handle_game_initialize(self, game: Game) -> None:
+        self._view.update(game)
 
     def _handle_view_game_start(self) -> None:
         self._model.start_game()

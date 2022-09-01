@@ -3,6 +3,7 @@ from enum import Enum
 
 
 class EventNames(Enum):
+    GAME_INITIALIZED = 'gameInitialized'
     GAME_STARTED = 'gameStarted'
     BET_MADE = 'betMade'
     CARD_ISSUED = 'cardIssued'

@@ -10,9 +10,7 @@ class BlackJack:
 
         self._presenter = Presenter()
         self._subscribe_to_presenter_events()
-
-    def start(self) -> None:
-        self._presenter.start()
+        self._presenter.init_model(self._saver.load_game())
 
     def _subscribe_to_presenter_events(self) -> None:
         self._presenter.on(EventNames.GAME_FINISHED, self._handle_game_finish)
@@ -21,5 +19,4 @@ class BlackJack:
         self._saver.save_game(game)
 
 
-black_jack = BlackJack()
-black_jack.start()
+BlackJack()
