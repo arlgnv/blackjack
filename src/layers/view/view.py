@@ -78,9 +78,11 @@ class View(Observable):
 Твой результат:
   Карты - {game[PlayerNames.HUMAN.value]['deck']}
   Очки - {game[PlayerNames.HUMAN.value]['score']}
+  Выигрышей за все время - {game[PlayerNames.HUMAN.value]['wins']}
 -------------------
 Результат Skynet:
   Карты - {game[PlayerNames.COMPUTER.value]['deck']}
   Очки - {game[PlayerNames.COMPUTER.value]['score']}
+  Выигрышей за все время - {game[PlayerNames.COMPUTER.value]['wins']}
 ===================
 ''')

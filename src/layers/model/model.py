@@ -41,7 +41,11 @@ class Model(Observable):
 
     def finish_game(self) -> None:
         self._game['stage'] = GameStages.FINISHED
-        self._game['winner'] = self._determine_winner()
+
+        winner = self._determine_winner()
+        if winner:
+            self._game['winner'] = winner
+            self._game[winner.value]['wins'] += 1
 
         self.notify(EventNames.GAME_FINISHED, self._game)
 

@@ -1,22 +1,21 @@
 from saver import Saver
 
-from layers.view import EventNames as ViewEventNames
-from layers.view.view import View
 from layers.model import Game, EventNames as ModelEventNames
 from layers.model.model import Model
+from layers.view import EventNames as ViewEventNames
+from layers.view.view import View
 
 
 class Presenter:
     def __init__(self) -> None:
-        self._view = View()
-        self._subscribe_to_view_events()
-
         self._model = Model()
         self._subscribe_to_model_events()
 
-        self._saver = Saver()
-
+        self._view = View()
+        self._subscribe_to_view_events()
         self._view.update(self._model.get_game_state())
+
+        self._saver = Saver()
 
     def _subscribe_to_view_events(self) -> None:
         self._view.subscribe(ViewEventNames.GAME_STARTED,

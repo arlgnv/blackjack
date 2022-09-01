@@ -26,6 +26,7 @@ class Player(TypedDict):
     money: int
     deck: list[int]
     score: int
+    wins: int
 
 
 class Game(TypedDict):

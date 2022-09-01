@@ -11,11 +11,13 @@ DEFAULT_STATE: Game = {
         'money': 0,
         'deck': [],
         'score': 0,
+        'wins': 0
     },
     'player': {
         'money': 0,
         'deck': [],
         'score': 0,
+        'wins': 0
     },
 }
 WIN_SCORE = 21
