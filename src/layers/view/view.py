@@ -17,7 +17,7 @@ class View(Observable):
                 self._request_deposit()
             case GameStages.BET_IS_AWAITED:
                 self._print_bet_request_preview(game)
-                self._request_bet(game)
+                self._request_bet(game[PlayerNames.PLAYER.value]['money'])
             case GameStages.CARD_TAKING_IS_AWAITED:
                 self._print_card_taking_request_preview(game)
                 self._request_card_taking()
@@ -44,17 +44,15 @@ class View(Observable):
 
         self.emit(EventNames.MONEY_DEPOSITED, int(deposit))
 
-    def _request_bet(self, game: Game) -> None:
-        max_bet = game[PlayerNames.PLAYER.value]['money']
-
+    def _request_bet(self, player_money: int) -> None:
         while True:
             bet = input(
-                f'Твоя ставка(мин. {MIN_BET}{RUBLE_SIGN}, макс. {max_bet}{RUBLE_SIGN}): ')
+                f'Твоя ставка(мин. {MIN_BET}{RUBLE_SIGN}, макс. {player_money}{RUBLE_SIGN}): ')
 
             if bet.isdigit():
                 bet_as_int = int(bet)
 
-                if MIN_BET <= bet_as_int <= max_bet:
+                if MIN_BET <= bet_as_int <= player_money:
                     break
 
         self.emit(EventNames.BET_MADE, bet_as_int)
