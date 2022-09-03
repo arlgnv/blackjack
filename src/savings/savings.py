@@ -12,12 +12,12 @@ class Savings:
         self._model = model
         self._subscribe_to_model_events()
 
-        self._savings_file_path = f'{Path(__file__).parent}/savings.json'
-        self._is_savings_file_exists = path.exists(self._savings_file_path)
+        self._savings_path = f'{Path(__file__).parent}/savings.json'
+        self._is_savings_exists = path.exists(self._savings_path)
 
     def load_last_saving(self) -> Game | None:
-        if self._is_savings_file_exists:
-            with open(self._savings_file_path, 'r', encoding='utf-8') as savings_file:
+        if self._is_savings_exists:
+            with open(self._savings_path, 'r', encoding='utf-8') as savings_file:
                 last_saving = load(savings_file)[0]
                 last_saving['stage'] = GameStages(last_saving['stage'])
 
@@ -37,27 +37,27 @@ class Savings:
         self._model.on(ModelEventNames.GAME_FINISHED, self._save_game)
 
     def _save_game(self, game: Game) -> None:
-        if self._is_savings_file_exists:
+        if self._is_savings_exists:
             if game['stage'] == GameStages.FINISHED:
                 self._add_saving(game)
             else:
                 self._update_last_saving(game)
         else:
             self._write_to_savings_file([game])
-            self._is_savings_file_exists = True
+            self._is_savings_exists = True
 
     def _write_to_savings_file(self, content: Any) -> None:
-        with open(self._savings_file_path, 'w', encoding='utf-8') as savings_file:
+        with open(self._savings_path, 'w', encoding='utf-8') as savings_file:
             dump(content, savings_file)
 
     def _add_saving(self, game: Game) -> None:
-        with open(self._savings_file_path, 'r', encoding='utf-8') as savings_file:
+        with open(self._savings_path, 'r', encoding='utf-8') as savings_file:
             savings = load(savings_file)
             savings.insert(0, game)
         self._write_to_savings_file(savings)
 
     def _update_last_saving(self, game: Game) -> None:
-        with open(self._savings_file_path, 'r', encoding='utf-8') as savings_file:
+        with open(self._savings_path, 'r', encoding='utf-8') as savings_file:
             savings = load(savings_file)
             savings[0] = game
         self._write_to_savings_file(savings)

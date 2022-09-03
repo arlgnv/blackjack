@@ -3,15 +3,23 @@ from enum import Enum
 
 
 class GameStages(str, Enum):
+    FIRST_STARTING_IS_AWAITED = 'firstStartingIsAwaited'
     STARTING_IS_AWAITED = 'startingIsAwaited'
+    DEPOSIT_IS_AWAITED = 'depositIsAwaited'
     BET_IS_AWAITED = 'betIsAwaited'
     CARD_TAKING_IS_AWAITED = 'cardTakingIsAwaited'
     FINISHED = 'finished'
 
 
 class PlayerNames(str, Enum):
-    COMPUTER = 'skynet'
-    HUMAN = 'player'
+    COMPUTER = 'computer'
+    PLAYER = 'player'
+
+
+class Computer(TypedDict):
+    deck: list[int]
+    score: int
+    wins: int
 
 
 class Player(TypedDict):
@@ -26,13 +34,9 @@ class Game(TypedDict):
     deck: list[int]
     bank: int
     winner: Optional[PlayerNames]
-    skynet: Player
+    computer: Computer
     player: Player
 
 
 class EventNames(Enum):
-    GAME_STARTED = 'gameStarted'
-    BET_MADE = 'betMade'
-    CARD_ISSUED = 'cardIssued'
-    GAME_FINISHED = 'gameFinished'
-    GAME_RESTARTED = 'gameRestarted'
+    GAME_STAGE_UPDATED = 'gameStageUpdated'

@@ -1,69 +1,74 @@
-from random import randint, choice, randrange
+from random import choice, randrange
 
 from observable import Observable
 
-from .constants import WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND, MIN_BET, SCORE_DESERVING_TAKING_RISK, SCORE_DONT_DESERVING_TAKING_RISK
+from .constants import DEFAULT_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND, SCORE_DESERVING_TAKING_RISK, SCORE_DONT_DESERVING_TAKING_RISK
 from .types import Game, GameStages, PlayerNames, EventNames
 
 
 class Model(Observable):
-    def set_game_state(self, game: Game) -> Game:
-        self._game = game
+    def init_game(self, game: Game | None) -> None:
+        self._game = game or DEFAULT_STATE
 
-        return self._game
+        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
 
     def start_game(self) -> None:
+        self._game['stage'] = GameStages.DEPOSIT_IS_AWAITED if self._check_if_player_broke(
+            PlayerNames.PLAYER) else GameStages.BET_IS_AWAITED
+        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
+
+    def add_money_to_player(self, amount: int) -> None:
+        if amount:
+            self._add_money(PlayerNames.PLAYER, amount)
+
         self._game['stage'] = GameStages.BET_IS_AWAITED
-
-        self._make_bet_for_computer()
-        self._hand_out_cards_to_computer()
-        self._hand_out_card(PlayerNames.HUMAN)
-        self._hand_out_card(PlayerNames.HUMAN)
-
-        self.emit(EventNames.GAME_STARTED, self._game)
+        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
 
     def make_bet_for_player(self, amount: int) -> None:
+        if amount:
+            self._game[PlayerNames.PLAYER.value]['money'] -= amount
+            self._game['bank'] += amount * 2
+
+        self._issue_cards_to_computer()
+        self._issue_card(PlayerNames.PLAYER)
+        self._issue_card(PlayerNames.PLAYER)
+
         self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
-        self._make_bet(PlayerNames.HUMAN, amount)
+        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
 
-        self.emit(EventNames.BET_MADE, self._game)
+    def issue_card_to_player(self) -> None:
+        self._issue_card(PlayerNames.PLAYER)
 
-    def hand_out_card_to_player(self) -> None:
-        self._hand_out_card(PlayerNames.HUMAN)
-
-        if self._check_can_player_take_card(PlayerNames.HUMAN):
-            self.emit(EventNames.CARD_ISSUED, self._game)
+        if self._check_can_player_take_card(PlayerNames.PLAYER):
+            self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
         else:
             self.finish_game()
 
     def finish_game(self) -> None:
-        self._game['stage'] = GameStages.FINISHED
-
         winner = self._determine_winner()
         if winner:
             self._game['winner'] = winner
             self._game[winner.value]['wins'] += 1
 
-        self.emit(EventNames.GAME_FINISHED, self._game)
+        if self._game['bank']:
+            self._distribute_winnings()
+
+        self._game['stage'] = GameStages.FINISHED
+        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
 
     def restart_game(self) -> None:
+        self._game['winner'] = None
+
         self._take_cards_from_player(PlayerNames.COMPUTER)
-        self._take_cards_from_player(PlayerNames.HUMAN)
-        self._distribute_winnings()
+        self._take_cards_from_player(PlayerNames.PLAYER)
         self.start_game()
 
-    def _make_bet_for_computer(self) -> None:
-        max_bet = min([self._game[PlayerNames.COMPUTER.value]
-                      ['money'], self._game[PlayerNames.HUMAN.value]['money']])
-
-        self._make_bet(PlayerNames.COMPUTER, randint(MIN_BET, max_bet))
-
-    def _hand_out_cards_to_computer(self) -> None:
-        self._hand_out_card(PlayerNames.COMPUTER)
-        self._hand_out_card(PlayerNames.COMPUTER)
+    def _issue_cards_to_computer(self) -> None:
+        self._issue_card(PlayerNames.COMPUTER)
+        self._issue_card(PlayerNames.COMPUTER)
 
         while self._decide_whether_to_take_card_to_computer():
-            self._hand_out_card(PlayerNames.COMPUTER)
+            self._issue_card(PlayerNames.COMPUTER)
 
     def _decide_whether_to_take_card_to_computer(self) -> bool:
         computer_score = self._game[PlayerNames.COMPUTER.value]['score']
@@ -78,11 +83,10 @@ class Model(Observable):
 
         return choice((True, False))
 
-    def _make_bet(self, player_name: PlayerNames, amount: int) -> None:
-        self._game[player_name.value]['money'] -= amount
-        self._game['bank'] += amount
+    def _add_money(self, player_name: PlayerNames, amount: int) -> None:
+        self._game[player_name.value]['money'] += amount
 
-    def _hand_out_card(self, player_name: PlayerNames) -> None:
+    def _issue_card(self, player_name: PlayerNames) -> None:
         card = self._game['deck'].pop(
             randrange(0, len(self._game['deck'])))
 
@@ -91,12 +95,12 @@ class Model(Observable):
 
     def _determine_winner(self) -> PlayerNames | None:
         skynet_score = self._game[PlayerNames.COMPUTER.value]['score']
-        player_score = self._game[PlayerNames.HUMAN.value]['score']
+        player_score = self._game[PlayerNames.PLAYER.value]['score']
 
         if skynet_score == player_score:
             return None
 
-        return PlayerNames.COMPUTER if abs(skynet_score - WIN_SCORE) < abs(player_score - WIN_SCORE) else PlayerNames.HUMAN
+        return PlayerNames.COMPUTER if abs(skynet_score - WIN_SCORE) < abs(player_score - WIN_SCORE) else PlayerNames.PLAYER
 
     def _take_cards_from_player(self, player_name: PlayerNames) -> None:
         self._game['deck'].extend(
@@ -108,16 +112,17 @@ class Model(Observable):
         bank = self._game['bank']
         winner = self._game['winner']
 
-        if winner:
-            self._game[winner.value]['money'] += bank
-            self._game['winner'] = None
-        else:
-            winnings = int(bank / 2)
-            self._game[PlayerNames.COMPUTER.value]['money'] += winnings
-            self._game[PlayerNames.HUMAN.value]['money'] += winnings
+        if winner == PlayerNames.PLAYER:
+            self._game[PlayerNames.PLAYER.value]['money'] += bank
+
+        if not winner:
+            self._game[PlayerNames.PLAYER.value]['money'] += int(bank / 2)
 
         self._game['bank'] = 0
 
     def _check_can_player_take_card(self, player_name: PlayerNames) -> bool:
         return len(
             self._game[player_name.value]['deck']) < MAX_CARDS_NUMBER_ON_HAND
+
+    def _check_if_player_broke(self, player_name: PlayerNames) -> bool:
+        return self._game[player_name.value]['money'] == 0
