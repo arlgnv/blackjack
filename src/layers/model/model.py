@@ -13,26 +13,26 @@ class Model(Observable):
         self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
 
     def start_game(self) -> None:
-        self._game['stage'] = GameStages.DEPOSIT_IS_AWAITED if self._check_if_player_broke(
-            PlayerNames.PLAYER) else GameStages.BET_IS_AWAITED
+        is_player_broke = self._game[PlayerNames.PLAYER.value]['money'] == 0
+        self._game['stage'] = GameStages.DEPOSIT_IS_AWAITED if is_player_broke else GameStages.BET_IS_AWAITED
         self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
 
     def add_money_to_player(self, amount: int) -> None:
         if amount:
-            self._add_money(PlayerNames.PLAYER, amount)
+            self._game[PlayerNames.PLAYER.value]['money'] += amount
+            self._game['stage'] = GameStages.BET_IS_AWAITED
+        else:
+            self._make_first_hand()
+            self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
 
-        self._game['stage'] = GameStages.BET_IS_AWAITED
         self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
 
     def make_bet_for_player(self, amount: int) -> None:
         if amount:
             self._game[PlayerNames.PLAYER.value]['money'] -= amount
-            self._game['bank'] += amount * 2
+            self._game['bank'] = amount * 2
 
-        self._issue_cards_to_computer()
-        self._issue_card(PlayerNames.PLAYER)
-        self._issue_card(PlayerNames.PLAYER)
-
+        self._make_first_hand()
         self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
         self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
 
@@ -58,10 +58,14 @@ class Model(Observable):
 
     def restart_game(self) -> None:
         self._game['winner'] = None
-
         self._take_cards_from_player(PlayerNames.COMPUTER)
         self._take_cards_from_player(PlayerNames.PLAYER)
         self.start_game()
+
+    def _make_first_hand(self) -> None:
+        self._issue_cards_to_computer()
+        self._issue_card(PlayerNames.PLAYER)
+        self._issue_card(PlayerNames.PLAYER)
 
     def _issue_cards_to_computer(self) -> None:
         self._issue_card(PlayerNames.COMPUTER)
@@ -82,9 +86,6 @@ class Model(Observable):
             return True
 
         return choice((True, False))
-
-    def _add_money(self, player_name: PlayerNames, amount: int) -> None:
-        self._game[player_name.value]['money'] += amount
 
     def _issue_card(self, player_name: PlayerNames) -> None:
         card = self._game['deck'].pop(
@@ -123,6 +124,3 @@ class Model(Observable):
     def _check_can_player_take_card(self, player_name: PlayerNames) -> bool:
         return len(
             self._game[player_name.value]['deck']) < MAX_CARDS_NUMBER_ON_HAND
-
-    def _check_if_player_broke(self, player_name: PlayerNames) -> bool:
-        return self._game[player_name.value]['money'] == 0
