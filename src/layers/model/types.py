@@ -39,4 +39,4 @@ class Game(TypedDict):
 
 
 class EventNames(Enum):
-    GAME_STAGE_UPDATED = 'gameStageUpdated'
+    GAME_UPDATED = 'gameUpdated'

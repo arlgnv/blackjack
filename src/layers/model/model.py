@@ -10,12 +10,12 @@ class Model(Observable):
     def init_game(self, game: Game | None) -> None:
         self._game = game or DEFAULT_STATE
 
-        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
+        self.emit(EventNames.GAME_UPDATED, self._game)
 
     def start_game(self) -> None:
         is_player_broke = self._game[PlayerNames.PLAYER.value]['money'] == 0
         self._game['stage'] = GameStages.DEPOSIT_IS_AWAITED if is_player_broke else GameStages.BET_IS_AWAITED
-        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
+        self.emit(EventNames.GAME_UPDATED, self._game)
 
     def add_money_to_player(self, amount: int) -> None:
         if amount:
@@ -25,7 +25,7 @@ class Model(Observable):
             self._make_first_hand()
             self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
 
-        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
+        self.emit(EventNames.GAME_UPDATED, self._game)
 
     def make_bet_for_player(self, amount: int) -> None:
         if amount:
@@ -34,13 +34,13 @@ class Model(Observable):
 
         self._make_first_hand()
         self._game['stage'] = GameStages.CARD_TAKING_IS_AWAITED
-        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
+        self.emit(EventNames.GAME_UPDATED, self._game)
 
     def issue_card_to_player(self) -> None:
         self._issue_card(PlayerNames.PLAYER)
 
         if self._check_can_player_take_card(PlayerNames.PLAYER):
-            self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
+            self.emit(EventNames.GAME_UPDATED, self._game)
         else:
             self.finish_game()
 
@@ -54,7 +54,7 @@ class Model(Observable):
             self._distribute_winnings()
 
         self._game['stage'] = GameStages.FINISHED
-        self.emit(EventNames.GAME_STAGE_UPDATED, self._game)
+        self.emit(EventNames.GAME_UPDATED, self._game)
 
     def restart_game(self) -> None:
         self._game['winner'] = None

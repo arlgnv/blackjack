@@ -22,10 +22,9 @@ class Presenter():
         self._view.on(ViewEventNames.GAME_RESTARTED, self._handle_game_restart)
 
     def _subscribe_to_model_events(self) -> None:
-        self._model.on(ModelEventNames.GAME_STAGE_UPDATED,
-                       self._handle_game_stage_update)
+        self._model.on(ModelEventNames.GAME_UPDATED, self._handle_game_update)
 
-    def _handle_game_stage_update(self, game: Game) -> None:
+    def _handle_game_update(self, game: Game) -> None:
         self._view.update(game)
 
     def _handle_game_start(self) -> None:
