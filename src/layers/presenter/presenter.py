@@ -1,11 +1,11 @@
-from layers.model import State, EventNames as ModelEventNames
-from layers.model.model import Model
-from layers.view import EventNames as ViewEventNames
-from layers.view.view import View
+import layers.view.types as ViewTypes
+from layers.view import view
+import layers.model.types as ModelTypes
+from layers.model import model
 
 
 class Presenter():
-    def __init__(self, view: View, model: Model) -> None:
+    def __init__(self, view: view.View, model: model.Model) -> None:
         self._view = view
         self._subscribe_to_view_events()
 
@@ -13,13 +13,16 @@ class Presenter():
         self._subscribe_to_model_events()
 
     def _subscribe_to_view_events(self) -> None:
-        self._view.on(ViewEventNames.GAME_STARTED, self._handle_game_start)
-        self._view.on(ViewEventNames.MONEY_DEPOSITED,
+        self._view.on(ViewTypes.EventNames.GAME_STARTED,
+                      self._handle_game_start)
+        self._view.on(ViewTypes.EventNames.MONEY_DEPOSITED,
                       self._handle_money_deposit)
-        self._view.on(ViewEventNames.BET_MADE, self._handle_bet_make)
-        self._view.on(ViewEventNames.CARD_TAKEN, self._handle_card_take)
-        self._view.on(ViewEventNames.CARD_REJECTED, self._handle_card_reject)
-        self._view.on(ViewEventNames.GAME_RESTARTED, self._handle_game_restart)
+        self._view.on(ViewTypes.EventNames.BET_MADE, self._handle_bet_make)
+        self._view.on(ViewTypes.EventNames.CARD_TAKEN, self._handle_card_take)
+        self._view.on(ViewTypes.EventNames.CARD_REJECTED,
+                      self._handle_card_reject)
+        self._view.on(ViewTypes.EventNames.GAME_RESTARTED,
+                      self._handle_game_restart)
 
     def _handle_game_start(self) -> None:
         self._model.start_game()
@@ -40,7 +43,8 @@ class Presenter():
         self._model.restart_game()
 
     def _subscribe_to_model_events(self) -> None:
-        self._model.on(ModelEventNames.STATE_UPDATED, self._handle_game_update)
+        self._model.on(ModelTypes.EventNames.STATE_UPDATED,
+                       self._handle_game_update)
 
-    def _handle_game_update(self, model_state: State) -> None:
-        self._view.update(model_state)
+    def _handle_game_update(self, state: ModelTypes.State) -> None:
+        self._view.update(state)
