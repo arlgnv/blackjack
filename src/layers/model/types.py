@@ -12,7 +12,8 @@ class GameStages(Enum):
 
 
 GameStage = Literal['firstStartingIsAwaited', 'startingIsAwaited',
-                    'depositIsAwaited', 'betIsAwaited', 'cardTakingIsAwaited', 'finished']
+                    'depositIsAwaited', 'betIsAwaited',
+                    'cardTakingIsAwaited', 'finished']
 
 
 class PlayerNames(Enum):

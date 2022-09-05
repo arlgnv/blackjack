@@ -1,4 +1,3 @@
-from typing import Any
 from random import choice, randrange
 
 from observable import Observable
