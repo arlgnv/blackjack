@@ -3,24 +3,21 @@ from random import choice, randrange
 
 from observable import Observable
 
-from .constants import INITIAL_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND, SCORE_WORTH_RISK, SCORE_NOT_WORTH_RISK
-from .types import State, GameStages, PlayerNames, PlayerName, EventNames
+from .constants import INITIAL_STATE, WIN_SCORE, MAX_CARDS_NUMBER_ON_HAND
+from .types import State, Game, GameStages, PlayerNames, PlayerName, Statistics, EventNames
 
 
 class Model(Observable):
-    def __init__(self) -> None:
-        super().__init__()
+    def init_state(self, game: Game | None, statistics: Statistics | None) -> None:
+        self._state: State = {
+            'game': game or INITIAL_STATE['game'],
+            'statistics': statistics or INITIAL_STATE['statistics']
+        }
 
-        self._state = INITIAL_STATE
+        if statistics and not game:
+            self._state['game']['stage'] = GameStages.STARTING_IS_AWAITED.value
 
-    def get_state(self) -> State:
-        return self._state
-
-    def update_game(self, game: Any) -> None:
-        self._state['game'] = {**self._state['game'], **game}
-
-    def update_statistics(self, statistics: Any) -> None:
-        self._state['statistics'] = {**self._state['statistics'], **statistics}
+        self.emit(EventNames.STATE_UPDATED, self._state)
 
     def start_game(self) -> None:
         is_player_broke = self._state['statistics']['player']['money'] == 0
@@ -68,7 +65,9 @@ class Model(Observable):
         self.emit(EventNames.STATE_UPDATED, self._state)
 
     def restart_game(self) -> None:
-        self._state['game']['winner'] = None
+        if self._state['game']['winner']:
+            self._state['game']['winner'] = None
+
         self._take_cards_from_player(PlayerNames.COMPUTER.value)
         self._take_cards_from_player(PlayerNames.PLAYER.value)
         self.start_game()
@@ -82,19 +81,16 @@ class Model(Observable):
         self._issue_card(PlayerNames.COMPUTER.value)
         self._issue_card(PlayerNames.COMPUTER.value)
 
-        while self._decide_whether_to_take_card_to_computer():
+        while self._check_can_player_take_card(PlayerNames.COMPUTER.value) and self._decide_whether_to_take_card_to_computer():
             self._issue_card(PlayerNames.COMPUTER.value)
 
     def _decide_whether_to_take_card_to_computer(self) -> bool:
         computer_score = self._state['game']['computer']['score']
-        is_it_stupid_to_take_card = computer_score > SCORE_NOT_WORTH_RISK
-        can_computer_take_card = self._check_can_player_take_card(
-            PlayerNames.COMPUTER.value)
 
-        if is_it_stupid_to_take_card or not can_computer_take_card:
+        if computer_score > 20:
             return False
 
-        if computer_score < SCORE_WORTH_RISK:
+        if computer_score < 17:
             return True
 
         return choice((True, False))

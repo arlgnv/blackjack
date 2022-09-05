@@ -12,23 +12,18 @@ class Savings:
         self._model = model
         self._subscribe_to_model_events()
 
-        self._game_file_path = f'{Path(__file__).parent}/game.json'
-        self._does_game_file_exist = path.exists(
-            self._game_file_path)
-
+        self._current_game_file_path = f'{Path(__file__).parent}/current_game.json'
         self._statistics_file_path = f'{Path(__file__).parent}/statistics.json'
-        self._does_statistics_file_exist = path.exists(
-            self._statistics_file_path)
 
-    def load_game(self) -> Game | None:
-        if self._does_game_file_exist:
-            return self._read_game_file()
+    def load_current_game(self) -> Game | None:
+        if path.exists(self._current_game_file_path):
+            return self._read_file(self._current_game_file_path)
 
         return None
 
     def load_statistics(self) -> Statistics | None:
-        if self._does_statistics_file_exist:
-            return self._read_statistics_file()
+        if path.exists(self._statistics_file_path):
+            return self._read_file(self._statistics_file_path)
 
         return None
 
@@ -36,24 +31,17 @@ class Savings:
         self._model.on(ModelEventNames.STATE_UPDATED, self._handle_game_update)
 
     def _handle_game_update(self, state: State) -> None:
-        if state['game']['stage'] == GameStages.FINISHED.value:
-            remove(self._game_file_path)
-        else:
-            self._write_to_game_file(state['game'])
+        game_stage = state['game']['stage']
 
-        self._write_to_statistics_file(state['statistics'])
+        if game_stage not in (GameStages.FIRST_STARTING_IS_AWAITED.value, GameStages.STARTING_IS_AWAITED.value):
+            if game_stage == GameStages.FINISHED.value:
+                remove(self._current_game_file_path)
+            else:
+                self._write_to_file(
+                    self._current_game_file_path, state['game'])
 
-    def _write_to_game_file(self, content: Any) -> None:
-        self._write_to_file(self._game_file_path, content)
-
-    def _read_game_file(self) -> Any:
-        return self._read_file(self._game_file_path)
-
-    def _write_to_statistics_file(self, content: Any) -> None:
-        self._write_to_file(self._statistics_file_path, content)
-
-    def _read_statistics_file(self) -> Statistics:
-        return self._read_file(self._statistics_file_path)
+            self._write_to_file(self._statistics_file_path,
+                                state['statistics'])
 
     def _write_to_file(self, file_path: str, content: Any) -> Any:
         with open(file_path, 'w', encoding='utf-8') as file:
