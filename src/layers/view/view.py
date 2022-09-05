@@ -1,30 +1,30 @@
 from observable import Observable
-from layers.model import State, GameStages, PlayerNames, MIN_BET
+from layers.model import State, GameStages, MIN_BET
 
 from .constants import WINNER_TO_DISPLAYED_WINNER, MESSAGES, AFFIRMATIVE_PLAYER_ANSWERS, RUBLE_SIGN
 from .types import EventNames
 
 
 class View(Observable):
-    def update(self, model_state: State) -> None:
-        match model_state['game']['stage']:
-            case GameStages.FIRST_STARTING_IS_AWAITED:
+    def update(self, state: State) -> None:
+        match state['game']['stage']:
+            case GameStages.FIRST_STARTING_IS_AWAITED.value:
                 print(MESSAGES['welcome'])
                 self._request_first_game_starting()
-            case GameStages.STARTING_IS_AWAITED:
+            case GameStages.STARTING_IS_AWAITED.value:
                 self._request_game_starting()
-            case GameStages.DEPOSIT_IS_AWAITED:
+            case GameStages.DEPOSIT_IS_AWAITED.value:
                 self._request_deposit()
-            case GameStages.BET_IS_AWAITED:
+            case GameStages.BET_IS_AWAITED.value:
                 self._print_bet_request_preview(
-                    model_state['statistics'][PlayerNames.PLAYER.value]['money'])
+                    state['statistics']['player']['money'])
                 self._request_bet(
-                    model_state['statistics'][PlayerNames.PLAYER.value]['money'])
-            case GameStages.CARD_TAKING_IS_AWAITED:
-                self._print_card_taking_request_preview(model_state)
+                    state['statistics']['player']['money'])
+            case GameStages.CARD_TAKING_IS_AWAITED.value:
+                self._print_card_taking_request_preview(state)
                 self._request_card_taking()
-            case GameStages.FINISHED:
-                self._print_game_result(model_state)
+            case GameStages.FINISHED.value:
+                self._print_game_result(state)
                 self._request_game_restart()
             case _:
                 pass
@@ -79,33 +79,33 @@ class View(Observable):
 ===================
 ''')
 
-    def _print_card_taking_request_preview(self, model_state: State) -> None:
+    def _print_card_taking_request_preview(self, state: State) -> None:
         print(f'''
 ===================
-Банк: {model_state['game']['bank']}{RUBLE_SIGN}
+Банк: {state['game']['bank']}{RUBLE_SIGN}
 -------------------
-Твои деньги: {model_state['statistics'][PlayerNames.PLAYER.value]['money']}{RUBLE_SIGN}
-Твои карты: {model_state['game'][PlayerNames.PLAYER.value]['deck']}
-Твои очки: {model_state['game'][PlayerNames.PLAYER.value]['score']}
+Твои деньги: {state['statistics']['player']['money']}{RUBLE_SIGN}
+Твои карты: {state['game']['player']['deck']}
+Твои очки: {state['game']['player']['score']}
 ===================
 ''')
 
-    def _print_game_result(self, model_state: State) -> None:
-        winner = model_state['game']['winner']
+    def _print_game_result(self, state: State) -> None:
+        winner = state['game']['winner']
 
         print(f'''
 ===================
-Победитель: {WINNER_TO_DISPLAYED_WINNER[winner.value if winner else 'draw']}
+Победитель: {WINNER_TO_DISPLAYED_WINNER[winner or 'draw']}
 -------------------
 Твой результат:
-  Карты: {model_state['game'][PlayerNames.PLAYER.value]['deck']}
-  Очки: {model_state['game'][PlayerNames.PLAYER.value]['score']}
-  Деньги: {model_state['statistics'][PlayerNames.PLAYER.value]['money']}{RUBLE_SIGN}
-  Выигрышей за все время: {model_state['statistics'][PlayerNames.PLAYER.value]['wins']}
+  Карты: {state['game']['player']['deck']}
+  Очки: {state['game']['player']['score']}
+  Деньги: {state['statistics']['player']['money']}{RUBLE_SIGN}
+  Выигрышей за все время: {state['statistics']['player']['wins']}
 -------------------
 Результат Skynet:
-  Карты: {model_state['game'][PlayerNames.COMPUTER.value]['deck']}
-  Очки: {model_state['game'][PlayerNames.COMPUTER.value]['score']}
-  Выигрышей за все время: {model_state['statistics'][PlayerNames.COMPUTER.value]['wins']}
+  Карты: {state['game']['computer']['deck']}
+  Очки: {state['game']['computer']['score']}
+  Выигрышей за все время: {state['statistics']['computer']['wins']}
 ===================
 ''')

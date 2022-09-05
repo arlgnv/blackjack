@@ -22,7 +22,7 @@ class BlackJack:
 
             if not game:
                 self._model.update_game(
-                    {'stage': GameStages.STARTING_IS_AWAITED})
+                    {'stage': GameStages.STARTING_IS_AWAITED.value})
 
         self._view.update(self._model.get_state())
 

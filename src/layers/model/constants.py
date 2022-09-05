@@ -4,7 +4,7 @@ DECK = [2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 6, 6, 6, 6, 7, 7,
         7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11]
 INITIAL_STATE: State = {
     'game': {
-        'stage': GameStages.FIRST_STARTING_IS_AWAITED,
+        'stage': GameStages.FIRST_STARTING_IS_AWAITED.value,
         'deck': DECK.copy(),
         'bank': 0,
         'winner': None,

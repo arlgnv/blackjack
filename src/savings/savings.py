@@ -22,10 +22,7 @@ class Savings:
 
     def load_game(self) -> Game | None:
         if self._does_game_file_exist:
-            game = self._read_game_file()
-            game['stage'] = GameStages(game['stage'])
-
-            return game
+            return self._read_game_file()
 
         return None
 
@@ -38,13 +35,13 @@ class Savings:
     def _subscribe_to_model_events(self) -> None:
         self._model.on(ModelEventNames.STATE_UPDATED, self._handle_game_update)
 
-    def _handle_game_update(self, model_state: State) -> None:
-        if model_state['game']['stage'] == GameStages.FINISHED:
+    def _handle_game_update(self, state: State) -> None:
+        if state['game']['stage'] == GameStages.FINISHED.value:
             remove(self._game_file_path)
         else:
-            self._write_to_game_file(model_state['game'])
+            self._write_to_game_file(state['game'])
 
-        self._write_to_statistics_file(model_state['statistics'])
+        self._write_to_statistics_file(state['statistics'])
 
     def _write_to_game_file(self, content: Any) -> None:
         self._write_to_file(self._game_file_path, content)
