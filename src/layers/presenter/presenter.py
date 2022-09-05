@@ -1,4 +1,4 @@
-from layers.model import Game, EventNames as ModelEventNames
+from layers.model import State, EventNames as ModelEventNames
 from layers.model.model import Model
 from layers.view import EventNames as ViewEventNames
 from layers.view.view import View
@@ -21,12 +21,6 @@ class Presenter():
         self._view.on(ViewEventNames.CARD_REJECTED, self._handle_card_reject)
         self._view.on(ViewEventNames.GAME_RESTARTED, self._handle_game_restart)
 
-    def _subscribe_to_model_events(self) -> None:
-        self._model.on(ModelEventNames.GAME_UPDATED, self._handle_game_update)
-
-    def _handle_game_update(self, game: Game) -> None:
-        self._view.update(game)
-
     def _handle_game_start(self) -> None:
         self._model.start_game()
 
@@ -44,3 +38,9 @@ class Presenter():
 
     def _handle_game_restart(self) -> None:
         self._model.restart_game()
+
+    def _subscribe_to_model_events(self) -> None:
+        self._model.on(ModelEventNames.STATE_UPDATED, self._handle_game_update)
+
+    def _handle_game_update(self, model_state: State) -> None:
+        self._view.update(model_state)

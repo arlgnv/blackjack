@@ -16,17 +16,28 @@ class PlayerNames(str, Enum):
     PLAYER = 'player'
 
 
+class ComputerStatistics(TypedDict):
+    wins: int
+
+
+class PlayerStatistics(TypedDict):
+    money: int
+    wins: int
+
+
+class Statistics(TypedDict):
+    computer: ComputerStatistics
+    player: PlayerStatistics
+
+
 class Computer(TypedDict):
     deck: list[int]
     score: int
-    wins: int
 
 
 class Player(TypedDict):
-    money: int
     deck: list[int]
     score: int
-    wins: int
 
 
 class Game(TypedDict):
@@ -38,5 +49,10 @@ class Game(TypedDict):
     player: Player
 
 
+class State(TypedDict):
+    game: Game
+    statistics: Statistics
+
+
 class EventNames(Enum):
-    GAME_UPDATED = 'gameUpdated'
+    STATE_UPDATED = 'stateUpdated'

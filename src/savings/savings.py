@@ -1,9 +1,9 @@
 from typing import Any
 from pathlib import Path
-from os import path
+from os import path, remove
 from json import load, dump
 
-from layers.model import Game, GameStages, PlayerNames, EventNames as ModelEventNames
+from layers.model import State, Game, GameStages, Statistics, EventNames as ModelEventNames
 from layers.model.model import Model
 
 
@@ -12,52 +12,56 @@ class Savings:
         self._model = model
         self._subscribe_to_model_events()
 
-        self._savings_path = f'{Path(__file__).parent}/savings.json'
-        self._is_savings_exists = path.exists(self._savings_path)
+        self._game_file_path = f'{Path(__file__).parent}/game.json'
+        self._does_game_file_exist = path.exists(
+            self._game_file_path)
 
-    def load_last_saving(self) -> Game | None:
-        if self._is_savings_exists:
-            with open(self._savings_path, 'r', encoding='utf-8') as savings_file:
-                last_saving = load(savings_file)[0]
-                last_saving['stage'] = GameStages(last_saving['stage'])
+        self._statistics_file_path = f'{Path(__file__).parent}/statistics.json'
+        self._does_statistics_file_exist = path.exists(
+            self._statistics_file_path)
 
-                winner = last_saving['winner']
-                if winner:
-                    last_saving['winner'] = PlayerNames(winner)
+    def load_game(self) -> Game | None:
+        if self._does_game_file_exist:
+            game = self._read_game_file()
+            game['stage'] = GameStages(game['stage'])
 
-                return last_saving
+            return game
+
+        return None
+
+    def load_statistics(self) -> Statistics | None:
+        if self._does_statistics_file_exist:
+            return self._read_statistics_file()
 
         return None
 
     def _subscribe_to_model_events(self) -> None:
-        self._model.on(ModelEventNames.GAME_STARTED,
-                       self._save_game)
-        self._model.on(ModelEventNames.BET_MADE, self._save_game)
-        self._model.on(ModelEventNames.CARD_ISSUED, self._save_game)
-        self._model.on(ModelEventNames.GAME_FINISHED, self._save_game)
+        self._model.on(ModelEventNames.STATE_UPDATED, self._handle_game_update)
 
-    def _save_game(self, game: Game) -> None:
-        if self._is_savings_exists:
-            if game['stage'] == GameStages.FINISHED:
-                self._add_saving(game)
-            else:
-                self._update_last_saving(game)
+    def _handle_game_update(self, model_state: State) -> None:
+        if model_state['game']['stage'] == GameStages.FINISHED:
+            remove(self._game_file_path)
         else:
-            self._write_to_savings_file([game])
-            self._is_savings_exists = True
+            self._write_to_game_file(model_state['game'])
 
-    def _write_to_savings_file(self, content: Any) -> None:
-        with open(self._savings_path, 'w', encoding='utf-8') as savings_file:
-            dump(content, savings_file)
+        self._write_to_statistics_file(model_state['statistics'])
 
-    def _add_saving(self, game: Game) -> None:
-        with open(self._savings_path, 'r', encoding='utf-8') as savings_file:
-            savings = load(savings_file)
-            savings.insert(0, game)
-        self._write_to_savings_file(savings)
+    def _write_to_game_file(self, content: Any) -> None:
+        self._write_to_file(self._game_file_path, content)
 
-    def _update_last_saving(self, game: Game) -> None:
-        with open(self._savings_path, 'r', encoding='utf-8') as savings_file:
-            savings = load(savings_file)
-            savings[0] = game
-        self._write_to_savings_file(savings)
+    def _read_game_file(self) -> Any:
+        return self._read_file(self._game_file_path)
+
+    def _write_to_statistics_file(self, content: Any) -> None:
+        self._write_to_file(self._statistics_file_path, content)
+
+    def _read_statistics_file(self) -> Statistics:
+        return self._read_file(self._statistics_file_path)
+
+    def _write_to_file(self, file_path: str, content: Any) -> Any:
+        with open(file_path, 'w', encoding='utf-8') as file:
+            dump(content, file)
+
+    def _read_file(self, file_path: str) -> Any:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return load(file)
