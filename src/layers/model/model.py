@@ -1,3 +1,4 @@
+import copy
 import random
 
 from observable import observable
@@ -6,22 +7,33 @@ from . import constants, types
 
 
 class Model(observable.Observable):
-    def init_state(self, game: types.Game | None, statistics: types.Statistics | None) -> None:
-        self._state: types.State = {
-            'game': game or constants.INITIAL_STATE['game'],
-            'statistics': statistics or constants.INITIAL_STATE['statistics']
-        }
+    _state: types.State
 
-        if statistics and not game:
-            self._state['game']['stage'] = types.GameStages.STARTING_IS_AWAITED.value
+    def __init__(self) -> None:
+        super().__init__()
 
-        self.emit(types.EventNames.STATE_UPDATED, self._state)
+        self._state = copy.deepcopy(constants.INITIAL_STATE)
+
+    def get_state(self) -> types.State:
+        return self._state
+
+    def set_state(self, state: types.State) -> None:
+        self._state = state
+
+        self._emit(types.EventNames.STATE_UPDATED.value, self._state)
 
     def start_game(self) -> None:
-        is_player_broke = self._state['statistics']['player']['money'] == 0
+        if self._state['game']['stage'] == types.GameStages.FINISHED.value:
+            if self._state['game']['winner']:
+                self._state['game']['winner'] = None
 
+            self._take_cards_from_player(types.PlayerNames.COMPUTER.value)
+            self._take_cards_from_player(types.PlayerNames.PLAYER.value)
+
+        is_player_broke = self._state['statistics']['player']['money'] == 0
         self._state['game']['stage'] = types.GameStages.DEPOSIT_IS_AWAITED.value if is_player_broke else types.GameStages.BET_IS_AWAITED.value
-        self.emit(types.EventNames.STATE_UPDATED, self._state)
+
+        self._emit(types.EventNames.STATE_UPDATED.value, self._state)
 
     def add_money_to_player(self, amount: int) -> None:
         if amount:
@@ -31,7 +43,7 @@ class Model(observable.Observable):
             self._make_first_hand()
             self._state['game']['stage'] = types.GameStages.CARD_TAKING_IS_AWAITED.value
 
-        self.emit(types.EventNames.STATE_UPDATED, self._state)
+        self._emit(types.EventNames.STATE_UPDATED.value, self._state)
 
     def make_bet_for_player(self, amount: int) -> None:
         if amount:
@@ -40,13 +52,13 @@ class Model(observable.Observable):
 
         self._make_first_hand()
         self._state['game']['stage'] = types.GameStages.CARD_TAKING_IS_AWAITED.value
-        self.emit(types.EventNames.STATE_UPDATED, self._state)
+        self._emit(types.EventNames.STATE_UPDATED.value, self._state)
 
     def issue_card_to_player(self) -> None:
         self._issue_card(types.PlayerNames.PLAYER.value)
 
         if self._check_can_player_take_card(types.PlayerNames.PLAYER.value):
-            self.emit(types.EventNames.STATE_UPDATED, self._state)
+            self._emit(types.EventNames.STATE_UPDATED.value, self._state)
         else:
             self.finish_game()
 
@@ -60,15 +72,7 @@ class Model(observable.Observable):
             self._distribute_winnings()
 
         self._state['game']['stage'] = types.GameStages.FINISHED.value
-        self.emit(types.EventNames.STATE_UPDATED, self._state)
-
-    def restart_game(self) -> None:
-        if self._state['game']['winner']:
-            self._state['game']['winner'] = None
-
-        self._take_cards_from_player(types.PlayerNames.COMPUTER.value)
-        self._take_cards_from_player(types.PlayerNames.PLAYER.value)
-        self.start_game()
+        self._emit(types.EventNames.STATE_UPDATED.value, self._state)
 
     def _make_first_hand(self) -> None:
         self._issue_cards_to_computer()

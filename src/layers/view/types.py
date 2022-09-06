@@ -1,3 +1,4 @@
+from typing import Literal
 from enum import Enum
 
 
@@ -8,3 +9,7 @@ class EventNames(Enum):
     CARD_TAKEN = 'cardTaken'
     CARD_REJECTED = 'cardRejected'
     GAME_RESTARTED = 'gameRestarted'
+
+
+EventName = Literal['gameStarted', 'moneyDeposited',
+                    'betMade', 'cardTaken', 'cardRejected', 'gameRestarted']

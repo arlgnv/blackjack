@@ -4,6 +4,8 @@ from . import types
 
 
 class Observable:
+    _observers: types.Observers
+
     def __init__(self) -> None:
         self._observers: types.Observers = {}
 
@@ -13,9 +15,7 @@ class Observable:
         else:
             self._observers[event_name] = [callback]
 
-    def emit(self, event_name: types.EventName, args: Optional[Any] = None) -> None:
-        for callback in self._observers[event_name]:
-            if args is None:
-                callback()
-            else:
+    def _emit(self, event_name: types.EventName, args: Optional[Any] = None) -> None:
+        if event_name in self._observers:
+            for callback in self._observers[event_name]:
                 callback(args)

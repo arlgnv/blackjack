@@ -64,3 +64,6 @@ class State(TypedDict):
 
 class EventNames(Enum):
     STATE_UPDATED = 'stateUpdated'
+
+
+EventName = Literal['stateUpdated']
