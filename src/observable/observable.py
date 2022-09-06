@@ -18,4 +18,7 @@ class Observable:
     def _emit(self, event_name: types.EventName, args: Optional[Any] = None) -> None:
         if event_name in self._observers:
             for callback in self._observers[event_name]:
-                callback(args)
+                if args is None:
+                    callback()
+                else:
+                    callback(args)

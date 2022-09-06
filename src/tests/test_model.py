@@ -3,23 +3,23 @@ import copy
 from layers.model import model as model_layer, constants as model_constants, types as model_types
 
 
-def test_init():
-    model = model_layer.Model()
-    state = model.get_state()
+# def test_init():
+#     model = model_layer.Model()
+#     state = model.get_state()
 
-    assert state == model_constants.INITIAL_STATE
+#     assert state == model_constants.INITIAL_STATE
 
 
-def test_update():
-    model = model_layer.Model()
+# def test_update():
+#     model = model_layer.Model()
 
-    assert model.get_state()['game']['bank'] == 0
+#     assert model.get_state()['game']['bank'] == 0
 
-    new_state = copy.deepcopy(model_constants.INITIAL_STATE)
-    new_state['game']['bank'] = 10
-    model.set_state(new_state)
+#     new_state = copy.deepcopy(model_constants.INITIAL_STATE)
+#     new_state['game']['bank'] = 10
+#     model.set_state(new_state)
 
-    assert model.get_state()['game']['bank'] == 10
+#     assert model.get_state()['game']['bank'] == 10
 
 
 def test_start_game():

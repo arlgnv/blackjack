@@ -33,11 +33,6 @@ class PlayerStatistics(TypedDict):
     wins: int
 
 
-class Statistics(TypedDict):
-    computer: ComputerStatistics
-    player: PlayerStatistics
-
-
 class Computer(TypedDict):
     deck: list[int]
     score: int
@@ -55,6 +50,11 @@ class Game(TypedDict):
     winner: Optional[PlayerName]
     computer: Computer
     player: Player
+
+
+class Statistics(TypedDict):
+    computer: ComputerStatistics
+    player: PlayerStatistics
 
 
 class State(TypedDict):

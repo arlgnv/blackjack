@@ -1,4 +1,5 @@
 from layers.view import view as view_layer, constants as view_constants
+from layers.model import constants as model_constants
 
 
 def test_update(capsys, monkeypatch):
