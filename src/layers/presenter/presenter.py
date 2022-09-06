@@ -47,7 +47,7 @@ class Presenter():
 
     def _subscribe_to_model_events(self) -> None:
         self._model.on(model_types.EventNames.STATE_UPDATED.value,
-                       self._handle_game_update)
+                       self._handle_state_update)
 
-    def _handle_game_update(self, state: model_types.State) -> None:
+    def _handle_state_update(self, state: model_types.State) -> None:
         self._view.update(state)
