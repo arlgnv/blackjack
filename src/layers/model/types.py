@@ -1,9 +1,8 @@
-from typing import Literal, TypedDict, Optional
+from typing import TypedDict, Literal, Optional
 from enum import Enum
 
 
 class GameStages(Enum):
-    FIRST_STARTING_IS_AWAITED = 'firstStartingIsAwaited'
     STARTING_IS_AWAITED = 'startingIsAwaited'
     DEPOSIT_IS_AWAITED = 'depositIsAwaited'
     BET_IS_AWAITED = 'betIsAwaited'
@@ -11,7 +10,7 @@ class GameStages(Enum):
     FINISHED = 'finished'
 
 
-GameStage = Literal['firstStartingIsAwaited', 'startingIsAwaited',
+GameStage = Literal['startingIsAwaited',
                     'depositIsAwaited', 'betIsAwaited',
                     'cardTakingIsAwaited', 'finished']
 
@@ -24,20 +23,6 @@ class PlayerNames(Enum):
 PlayerName = Literal['computer', 'player']
 
 
-class ComputerStatistics(TypedDict):
-    wins: int
-
-
-class PlayerStatistics(TypedDict):
-    money: int
-    wins: int
-
-
-class Computer(TypedDict):
-    deck: list[int]
-    score: int
-
-
 class Player(TypedDict):
     deck: list[int]
     score: int
@@ -48,8 +33,17 @@ class Game(TypedDict):
     deck: list[int]
     bank: int
     winner: Optional[PlayerName]
-    computer: Computer
+    computer: Player
     player: Player
+
+
+class ComputerStatistics(TypedDict):
+    wins: int
+
+
+class PlayerStatistics(TypedDict):
+    money: int
+    wins: int
 
 
 class Statistics(TypedDict):

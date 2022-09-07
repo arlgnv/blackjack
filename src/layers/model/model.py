@@ -2,31 +2,29 @@ import copy
 import random
 
 from observable import observable
-from savings import savings
+from savings import savings as savings_module
 
 from . import constants, types
 
 
 class Model(observable.Observable):
     _state: types.State
+    _savings: savings_module.Savings
 
-    def __init__(self) -> None:
+    def __init__(self, savings: savings_module.Savings) -> None:
         super().__init__()
 
-        self._savings = savings.Savings()
+        self._savings = savings
         saving = self._savings.load()
 
         self._state = saving if saving else copy.deepcopy(
             constants.INITIAL_STATE)
 
-        if saving and saving['game']['stage'] == types.GameStages.FINISHED.value:
-            self._state['game']['stage'] = types.GameStages.STARTING_IS_AWAITED.value
-
     def get_state(self) -> types.State:
         return self._state
 
     def start_game(self) -> None:
-        if self._state['game']['stage'] in (types.GameStages.FINISHED.value, types.GameStages.STARTING_IS_AWAITED.value):
+        if self._state['game']['stage'] == types.GameStages.FINISHED.value:
             if self._state['game']['winner']:
                 self._state['game']['winner'] = None
 

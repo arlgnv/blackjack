@@ -7,10 +7,8 @@ from . import constants, types
 class View(observable.Observable):
     def update(self, state: model_types.State) -> None:
         match state['game']['stage']:
-            case model_types.GameStages.FIRST_STARTING_IS_AWAITED.value:
-                print(constants.MESSAGES['welcome'])
-                self._request_first_game_starting()
             case model_types.GameStages.STARTING_IS_AWAITED.value:
+                print(constants.MESSAGES['welcome'])
                 self._request_game_starting()
             case model_types.GameStages.DEPOSIT_IS_AWAITED.value:
                 self._request_deposit()
@@ -28,14 +26,8 @@ class View(observable.Observable):
             case _:
                 pass
 
-    def _request_first_game_starting(self) -> None:
-        request_text = constants.REQUESTS['try_luck']
-
-        if self._check_if_player_answer_affirmative(input(request_text)):
-            self._emit(types.EventNames.GAME_STARTED.value)
-
     def _request_game_starting(self) -> None:
-        request_text = constants.REQUESTS['one_more_game']
+        request_text = constants.REQUESTS['try_luck']
 
         if self._check_if_player_answer_affirmative(input(request_text)):
             self._emit(types.EventNames.GAME_STARTED.value)
