@@ -24,13 +24,6 @@ class Model(observable.Observable):
         return self._state
 
     def start_game(self) -> None:
-        if self._state['game']['stage'] == types.GameStages.FINISHED.value:
-            if self._state['game']['winner']:
-                self._state['game']['winner'] = None
-
-            self._take_cards_from_player(types.PlayerNames.COMPUTER.value)
-            self._take_cards_from_player(types.PlayerNames.PLAYER.value)
-
         is_player_broke = self._state['statistics']['player']['money'] == 0
         self._state['game']['stage'] = types.GameStages.DEPOSIT_IS_AWAITED.value if is_player_broke else types.GameStages.BET_IS_AWAITED.value
 
@@ -79,6 +72,14 @@ class Model(observable.Observable):
         self._state['game']['stage'] = types.GameStages.FINISHED.value
         self._savings.save(self._state)
         self._emit(types.EventNames.STATE_UPDATED.value, self._state)
+
+    def restart_game(self) -> None:
+        if self._state['game']['winner']:
+            self._state['game']['winner'] = None
+
+        self._take_cards_from_player(types.PlayerNames.COMPUTER.value)
+        self._take_cards_from_player(types.PlayerNames.PLAYER.value)
+        self.start_game()
 
     def _make_first_hand(self) -> None:
         self._issue_cards_to_computer()

@@ -43,7 +43,7 @@ class Presenter():
         self._model.finish_game()
 
     def _handle_game_restart(self) -> None:
-        self._model.start_game()
+        self._model.restart_game()
 
     def _subscribe_to_model_events(self) -> None:
         self._model.on(model_types.EventNames.STATE_UPDATED.value,
