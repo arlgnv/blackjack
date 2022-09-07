@@ -1,12 +1,23 @@
+import unittest
 import os
 
-from savings import savings as savings_module, constants as savings_constants
+from savings import savings, constants as savings_constants
+from layers.model import constants as model_constants
 
 
-def test_load():
-    savings = savings_module.Savings()
+class TestSavings(unittest.TestCase):
+    def test_load(self):
+        savings_instance = savings.Savings()
 
-    if os.path.exists(savings_constants.SAVING_FILE_PATH):
-        assert savings.load() is not None
-    else:
-        assert savings.load() is None
+        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+            self.assertIsNotNone(savings_instance.load())
+        else:
+            self.assertIsNone(savings_instance.load())
+
+    def test_save(self):
+        savings_instance = savings.Savings()
+
+        if not os.path.exists(savings_constants.SAVING_FILE_PATH):
+            savings_instance.save(model_constants.INITIAL_STATE)
+
+            self.assertTrue(os.path.exists(savings_constants.SAVING_FILE_PATH))

@@ -1,16 +1,16 @@
-from layers.view import view as view_layer, types as view_types
-from layers.model import model as model_layer, types as model_types
+from layers.view import view, types as view_types
+from layers.model import model, types as model_types
 
 
 class Presenter():
-    _view: view_layer.View
-    _model: model_layer.Model
+    _view: view.View
+    _model: model.Model
 
-    def __init__(self, view: view_layer.View, model: model_layer.Model) -> None:
-        self._view = view
+    def __init__(self, view_instance: view.View, model_instance: model.Model) -> None:
+        self._view = view_instance
         self._subscribe_to_view_events()
 
-        self._model = model
+        self._model = model_instance
         self._subscribe_to_model_events()
 
     def _subscribe_to_view_events(self) -> None:

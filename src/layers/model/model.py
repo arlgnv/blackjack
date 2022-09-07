@@ -2,19 +2,19 @@ import copy
 import random
 
 from observable import observable
-from savings import savings as savings_module
+from savings import savings
 
 from . import constants, types
 
 
 class Model(observable.Observable):
     _state: types.State
-    _savings: savings_module.Savings
+    _savings: savings.Savings
 
-    def __init__(self, savings: savings_module.Savings) -> None:
+    def __init__(self, savings_instance: savings.Savings) -> None:
         super().__init__()
 
-        self._savings = savings
+        self._savings = savings_instance
         saving = self._savings.load()
 
         self._state = saving if saving else copy.deepcopy(

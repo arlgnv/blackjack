@@ -1,48 +1,85 @@
-from layers.model import model as model_layer, constants as model_constants, types as model_types
+import unittest
+import os
+
+from layers.model import model, constants as model_constants, types as model_types
+from savings import savings, constants as savings_constants
 
 
-def test_init():
-    model = model_layer.Model()
-    state = model.get_state()
+class TestModel(unittest.TestCase):
+    def test_init(self):
+        model_instance = model.Model(savings.Savings())
+        state = model_instance.get_state()
 
-    assert state == model_constants.INITIAL_STATE
+        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+            self.assertNotEqual(state, model_constants.INITIAL_STATE)
+        else:
+            self.assertEqual(state, model_constants.INITIAL_STATE)
+
+    def test_start_game(self):
+        model_instance = model.Model(savings.Savings())
+
+        model_instance.start_game()
+        self.assertEqual(model_instance.get_state()[
+                         'game']['stage'], model_types.GameStages.BET_IS_AWAITED.value)
+
+    def test_add_money_to_player(self):
+        model_instance = model.Model(savings.Savings())
+
+        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+            saved_money = model_instance.get_state(
+            )['statistics']['player']['money']
+
+            model_instance.add_money_to_player(10)
+            self.assertEqual(model_instance.get_state(
+            )['statistics']['player']['money'], saved_money + 10)
+        else:
+            self.assertEqual(model_instance.get_state(
+            )['statistics']['player']['money'], model_constants.INITIAL_STATE['statistics']['player']['money'])
+            model_instance.add_money_to_player(10)
+            self.assertEqual(model_instance.get_state(
+            )['statistics']['player']['money'], model_constants.INITIAL_STATE['statistics']['player']['money'] + 10)
+
+    def test_make_bet_for_player(self):
+        model_instance = model.Model(savings.Savings())
+
+        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+            saved_money = model_instance.get_state(
+            )['statistics']['player']['money']
+
+            model_instance.make_bet_for_player(10)
+            self.assertEqual(model_instance.get_state(
+            )['statistics']['player']['money'], saved_money - 10)
+        else:
+            self.assertEqual(model_instance.get_state(
+            )['statistics']['player']['money'], model_constants.INITIAL_STATE['statistics']['player']['money'])
+            model_instance.make_bet_for_player(10)
+            self.assertEqual(model_instance.get_state(
+            )['statistics']['player']['money'], model_constants.INITIAL_STATE['statistics']['player']['money'] - 10)
+
+    def test_issue_card_to_player(self):
+        model_instance = model.Model(savings.Savings())
+
+        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+            saved_deck_size = len(model_instance.get_state()
+                                  ['game']['player']['deck'])
+
+            model_instance.issue_card_to_player()
+            self.assertEqual(len(model_instance.get_state()[
+                'game']['player']['deck']), saved_deck_size + 1)
+        else:
+            self.assertEqual(len(model_instance.get_state()[
+                'game']['player']['deck']), 0)
+            model_instance.issue_card_to_player()
+            self.assertEqual(len(model_instance.get_state()[
+                'game']['player']['deck']), 1)
+
+    def test_finish_game(self):
+        model_instance = model.Model(savings.Savings())
+
+        model_instance.finish_game()
+        self.assertEqual(model_instance.get_state()[
+            'game']['stage'], model_types.GameStages.FINISHED.value)
 
 
-def test_start_game():
-    model = model_layer.Model()
-
-    model.start_game()
-    assert model.get_state()[
-        'game']['stage'] == model_types.GameStages.BET_IS_AWAITED.value
-
-
-def test_add_money_to_player():
-    model = model_layer.Model()
-
-    assert model.get_state()['statistics']['player']['money'] == 50
-    model.add_money_to_player(10)
-    assert model.get_state()['statistics']['player']['money'] == 60
-
-
-def test_make_bet_for_player():
-    model = model_layer.Model()
-
-    assert model.get_state()['statistics']['player']['money'] == 50
-    model.make_bet_for_player(10)
-    assert model.get_state()['statistics']['player']['money'] == 40
-
-
-def test_issue_card_to_player():
-    model = model_layer.Model()
-
-    assert len(model.get_state()['game']['player']['deck']) == 0
-    model.issue_card_to_player()
-    assert len(model.get_state()['game']['player']['deck']) == 1
-
-
-def test_finish_game():
-    model = model_layer.Model()
-
-    model.finish_game()
-    assert model.get_state()[
-        'game']['stage'] == model_types.GameStages.FINISHED.value
+if __name__ == '__main__':
+    unittest.main()
