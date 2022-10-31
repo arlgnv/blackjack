@@ -1,8 +1,8 @@
 from typing import Callable
 
-from layers.view import types as view_types
-from layers.model import types as model_types
+from layers.view.types import EventName as ViewEventName
+from layers.model.types import EventName as ModelEventName
 
 
-EventName = view_types.EventName | model_types.EventName
+EventName = ViewEventName | ModelEventName
 Observers = dict[EventName, list[Callable[..., None]]]

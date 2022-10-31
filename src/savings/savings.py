@@ -2,25 +2,25 @@ from typing import Any
 import os
 import json
 
-from layers.model import types as model_types
+from layers.model.types import State
 
-from . import constants
+from .constants import SAVINGS_FILE_PATH
 
 
 class Savings:
-    _is_saving_file_exist: bool
+    _is_savings_file_exist: bool
 
     def __init__(self) -> None:
-        self._is_saving_file_exist = os.path.exists(constants.SAVING_FILE_PATH)
+        self._is_savings_file_exist = os.path.exists(SAVINGS_FILE_PATH)
 
-    def load(self) -> model_types.State | None:
-        if self._is_saving_file_exist:
-            return self._read_file(constants.SAVING_FILE_PATH)
+    def load(self) -> State | None:
+        if self._is_savings_file_exist:
+            return self._read_file(SAVINGS_FILE_PATH)
 
         return None
 
-    def save(self, state: model_types.State) -> None:
-        self._write_to_file(constants.SAVING_FILE_PATH, state)
+    def save(self, state: State) -> None:
+        self._write_to_file(SAVINGS_FILE_PATH, state)
 
     def _write_to_file(self, file_path: str, content: Any) -> Any:
         with open(file_path, 'w', encoding='utf-8') as file:

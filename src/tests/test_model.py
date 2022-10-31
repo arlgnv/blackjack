@@ -10,7 +10,7 @@ class TestModel(unittest.TestCase):
         model_instance = model.Model(savings.Savings())
         state = model_instance.get_state()
 
-        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+        if os.path.exists(savings_constants.SAVINGS_FILE_PATH):
             self.assertNotEqual(state, model_constants.INITIAL_STATE)
         else:
             self.assertEqual(state, model_constants.INITIAL_STATE)
@@ -25,7 +25,7 @@ class TestModel(unittest.TestCase):
     def test_add_money_to_player(self):
         model_instance = model.Model(savings.Savings())
 
-        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+        if os.path.exists(savings_constants.SAVINGS_FILE_PATH):
             saved_money = model_instance.get_state(
             )['statistics']['player']['money']
 
@@ -42,7 +42,7 @@ class TestModel(unittest.TestCase):
     def test_make_bet_for_player(self):
         model_instance = model.Model(savings.Savings())
 
-        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+        if os.path.exists(savings_constants.SAVINGS_FILE_PATH):
             saved_money = model_instance.get_state(
             )['statistics']['player']['money']
 
@@ -59,7 +59,7 @@ class TestModel(unittest.TestCase):
     def test_issue_card_to_player(self):
         model_instance = model.Model(savings.Savings())
 
-        if os.path.exists(savings_constants.SAVING_FILE_PATH):
+        if os.path.exists(savings_constants.SAVINGS_FILE_PATH):
             saved_deck_size = len(model_instance.get_state()
                                   ['game']['player']['deck'])
 
