@@ -8,5 +8,6 @@
 ## Installation
 
 Linux:
-
-`git clone https://gitlab.com/alagunoff/blackjack.git && python3 blackjack/src/blackjack.py`
+1. Clone repo. `git clone https://gitlab.com/alagunoff/blackjack.git`
+2. Install required dependencies from *requirement.txt* file in root folder
+3. Start game with *project-folder/src/blackjack.py* script
