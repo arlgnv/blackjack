@@ -8,5 +8,5 @@
 ## Installation steps:
 
 1. Clone repo
-2. Install required dependencies from *requirement.txt* file in root folder
-3. Start game with *blackjack.py* script in root folder
+2. Install required dependencies from *requirements.txt* file in cloned folder
+3. Start game with *blackjack.py* script in *src* folder of cloned folder
