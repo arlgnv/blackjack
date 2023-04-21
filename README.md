@@ -3,7 +3,7 @@
 
 Ты можешь делать ставки, пасовать и многое другое. Попробуй свою удачу в этой интересной игре играя против...Skynet! Да, Skynet отказался от затеи покорить мир и теперь практикует себя в этой игре.
 
-![](https://static1.tgstat.ru/channels/_0/8e/8e770e8504a1c34c9d89811c1a14c36a.jpg)
+![](https://static.vecteezy.com/system/resources/previews/002/232/212/original/blackjack-logo-with-green-ribbon-and-on-a-green-background-isolated-card-game-casino-game-free-vector.jpg)
 
 ## Installation steps:
 
