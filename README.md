@@ -1,7 +1,5 @@
 # BlackJack
-> Straightforward and familiar to everyone game, called "BlackJack"
-
-Ты можешь делать ставки, пасовать и многое другое. Попробуй свою удачу в этой интересной игре играя против...Skynet! Да, Skynet отказался от затеи покорить мир и теперь практикует себя в этой игре.
+> Straightforward and familiar to everyone game
 
 ![](https://play-lh.googleusercontent.com/009hpXoLRxULWBEF8VsHnNTjFrOQVFKfkQfIxZcDGWtVSZEU5mKtSJyy3Zv3pxVcZQ)
 
