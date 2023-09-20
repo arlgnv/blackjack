@@ -1,10 +1,20 @@
 # BlackJack
-> Straightforward and familiar to everyone game
 
-![](https://play-lh.googleusercontent.com/009hpXoLRxULWBEF8VsHnNTjFrOQVFKfkQfIxZcDGWtVSZEU5mKtSJyy3Zv3pxVcZQ)
+## Prerequisites
 
-## Installation steps:
+1. [Git](https://git-scm.com/downloads)
+2. [Python](https://www.python.org/downloads/)
+
+## Installation
 
 1. Clone repository
-2. Install required dependencies from *requirements.txt* file in cloned repository
-3. Start game with *blackjack.py* script in *src* folder of cloned repository
+
+```bash
+git clone https://github.com/alagunoff/blackjack.git
+```
+
+2. Install required dependencies from _requirements.txt_ file in cloned repository
+
+## Starting project
+
+1. Run _blackjack.py_ script in _src_ folder of cloned repository
