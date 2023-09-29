@@ -1,4 +1,4 @@
-# BlackJack
+# Blackjack
 
 ## Prerequisites
 
