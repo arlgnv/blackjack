@@ -10,7 +10,7 @@
 1. Clone repository
 
 ```bash
-git clone https://github.com/alagunoff/blackjack.git
+git clone https://github.com/arlgnv/blackjack.git
 ```
 
 2. Install required dependencies from _requirements.txt_ file in cloned repository
