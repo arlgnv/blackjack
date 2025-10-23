@@ -1,4 +1,5 @@
 # Blackjack
+Straightforward and familiar to everyone card game
 
 ## Prerequisites
 
